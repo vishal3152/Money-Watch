@@ -1,0 +1,126 @@
+{
+  "name": "paisa-watch",
+  "version": "0.1.0",
+  "private": true,
+  "license": "PolyForm-Noncommercial-1.0.0",
+  "main": "electron/main.cjs",
+  "scripts": {
+    "dev": "tsx scripts/prepare-cloud-database.ts && DEPLOYMENT_MODE=cloud next dev",
+    "build": "next build",
+    "start": "tsx scripts/prepare-cloud-database.ts && DEPLOYMENT_MODE=cloud next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "electron:dev": "env -u ELECTRON_RUN_AS_NODE ELECTRON_DEV=1 electron .",
+    "electron:start": "pnpm build && env -u ELECTRON_RUN_AS_NODE electron .",
+    "electron:package": "bash scripts/package-electron.sh",
+    "release": "bash scripts/release.sh",
+    "prepare:database": "tsx scripts/prepare-database.ts",
+    "prepare:cloud-database": "tsx scripts/prepare-cloud-database.ts",
+    "email-sync:poll": "tsx scripts/email-sync-poll-daemon.ts",
+    "supabase:start": "supabase start && POSTGRES_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres pnpm prepare:cloud-database",
+    "supabase:stop": "supabase stop",
+    "demo:generate": "tsx scripts/demo-data/write-seed-data.ts",
+    "demo:seed": "bash scripts/demo-data/seed-from-browser.sh"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "@supabase/ssr": "^0.12.5",
+    "@supabase/supabase-js": "^2.115.0",
+    "better-sqlite3": "^13.0.3",
+    "drizzle-orm": "^0.44.5",
+    "imapflow": "^2.0.0",
+    "mailparser": "^3.9.24",
+    "next": "15.5.25",
+    "postgres": "^3.4.9",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "zod": "^4.6.1"
+  },
+  "devDependencies": {
+    "@electron/asar": "^4.3.0",
+    "@types/better-sqlite3": "^9.6.0",
+    "@types/mailparser": "^3.4.6",
+    "@types/node": "^22.17.0",
+    "@types/react": "^19.1.10",
+    "@types/react-dom": "^19.1.7",
+    "drizzle-kit": "^0.31.4",
+    "electron": "^44.1.1",
+    "electron-builder": "^26.15.3",
+    "esbuild": "^0.25.12",
+    "eslint": "^9.33.0",
+    "eslint-config-next": "15.5.25",
+    "supabase": "^2.116.0",
+    "tsx": "^4.23.13",
+    "typescript": "^5.9.2",
+    "vercel": "^59.11.7",
+    "vitest": "^2.1.9"
+  },
+  "build": {
+    "appId": "app.paisawatch.desktop",
+    "productName": "Money Watch",
+    "copyright": "Copyright © Money Watch",
+    "directories": {
+      "app": "dist/electron-app",
+      "output": "dist/electron"
+    },
+    "files": [
+      "electron/main.cjs",
+      "electron/preload.cjs",
+      "electron/app-paths.cjs",
+      "package.json"
+    ],
+    "mac": {
+      "category": "public.app-category.finance",
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "identity": null,
+      "electronLanguages": [
+        "en"
+      ],
+      "extraResources": [
+        {
+          "from": "dist/electron-resources/mac/",
+          "to": "."
+        }
+      ]
+    },
+    "dmg": {
+      "format": "ULFO"
+    },
+    "linux": {
+      "category": "Office",
+      "target": [
+        "AppImage"
+      ],
+      "extraResources": [
+        {
+          "from": "dist/electron-resources/linux/",
+          "to": "."
+        }
+      ]
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "signExecutable": false,
+      "extraResources": [
+        {
+          "from": "dist/electron-resources/win/",
+          "to": "."
+        }
+      ]
+    },
+    "nsis": {
+      "packElevateHelper": false
+    },
+    "npmRebuild": false,
+    "afterPack": "./scripts/electron-after-pack.cjs"
+  }
+  
+}

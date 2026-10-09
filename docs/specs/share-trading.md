@@ -1,0 +1,83 @@
+# Share Trading
+
+## Purpose
+
+Let the owner track shares held in different companies, at a broker, without treating share ownership as an Account's single money balance.
+
+## Behavior
+
+- A ShareTradingAccount belongs to one Institution and is denominated in one currency.
+- It is top-level: not linked to any cash Account, unlike a FixedDeposit's linked payout Account.
+- It records a Buy or Sell StockTransaction per trade: scrip/symbol code, quantity, price per unit, date, description.
+- A ShareTradingAccount's Holdings — net quantity per scrip/symbol code — are computed from its StockTransactions (Buy adds, Sell subtracts), the same way an Account's balance is computed from its Transactions rather than stored.
+- A company with a fully-exited position stays listed at zero quantity rather than being dropped from Holdings.
+- The owner can also import stock trades via their own AI assistant over MCP (`docs/specs/import.md`'s architecture, extended here): five tools — `list_share_trading_accounts`, `create_share_trading_account`, `resolve_share_trading_account`, `stage_stock_import`, `commit_stock_import` — mirror the Account-side list/create/resolve/stage/commit tools, with a StockTransaction-shaped line item (scrip/symbol code, Buy/Sell, quantity, price per unit, date, description) instead of a single signed amount. `resolve_share_trading_account` reuses `resolveAccountByNumberSuffix` (`src/domain/account-number-match.ts`) unchanged. `create_share_trading_account` requires owner `confirmed: true` and the same ≥4-digit account-number / last-4 reuse rules as `create_account`. Email alert sync for broker trade-confirmation emails is a separate, deferred decision — broker confirmations are far less uniform than bank debit/credit alerts and are often PDF attachments, so this is not assumed to extend the same way.
+- A `commit_stock_import` call creates one `StockImportBatch` and its `Imported`-trust-status StockTransactions, exactly like `commit_import` does for `ImportBatch`/Transaction (`docs/specs/import.md`), including the same optional retry-safe `idempotencyKey`. It always writes — a line item that matches an existing StockTransaction (by `externalRef` when both have one, else by the natural key) is still created, with the match persisted as `possibleDuplicateOfTransactionId` (a Suspected Duplicate — `CONTEXT.md`), the same accept-and-flag behavior `docs/specs/import.md`/`docs/adr/0014-duplicate-imports-flagged-and-gated-at-confirm-not-blocked-at-commit.md` describe for the Account side. `StockImportBatch` is a separate entity from `ImportBatch`, not the same one reused — a stock trade has no closing-balance concept, so `confirmAll` has no BalanceSnapshot/Reconciliation branch at all (unlike `ImportBatchRepository.confirmAll()`).
+- Imported StockTransactions count toward Holdings immediately, the same way an Imported Transaction counts toward an Account's computed balance before the owner confirms it — trust status is a review marker, not a gate on whether a trade counts.
+
+## Invariants
+
+- Quantity and price-per-unit are represented as safe integers (quantity: whole shares; price: minor currency units).
+- A ShareTradingAccount references an existing Institution.
+- A StockTransaction references an existing ShareTradingAccount.
+- A Sell is not validated against currently-held quantity, the same way an Account's computed balance is never checked against a minimum — partial or incomplete trade history can make a legitimate Sell look like an oversell, so a negative or zero net quantity is valid and stays visible (`src/domain/holdings.ts`).
+- Deleting an Institution is blocked while it still has a ShareTradingAccount (`InstitutionRepository`/`PgInstitutionRepository`'s dependent-count guard).
+- Domain Holdings computation remains independent of the database and web framework.
+- `commit_stock_import`/`stage_stock_import` require an existing `shareTradingAccountId`; an unknown id is rejected before any write.
+- `commit_stock_import` requires at least one line item; an empty batch is rejected before any write (`EmptyStockImportBatchError`).
+- Stock import quantity and price are decimal strings, never pre-scaled integers accepted from the assistant — quantity is validated as a positive whole number (`parseWholeShareQuantity`), price is parsed against the ShareTradingAccount's actual currency (`parseDecimalToMinorUnits`), the same untrusted-caller convention `docs/specs/import.md` uses for Transaction amounts.
+- Every StockTransaction created by `commit_stock_import` carries `trustStatus: "Imported"` and a non-null `importBatchId`; a manually-entered StockTransaction (via `/share-trading-accounts/[id]/stock-transactions/new`) is always `Confirmed` with a null `importBatchId`.
+- `stage_stock_import`'s duplicate flag (advisory) and `commit_stock_import`'s duplicate match (persisted) both key on `(shareTradingAccountId, occurredAt, scripCode, type, quantity, pricePerUnitMinor)` when neither side has an `externalRef`; when a line item's and an existing StockTransaction's `externalRef` are both non-null, that match is preferred instead. Neither ever blocks `commit_stock_import` — it always writes. When more than one existing StockTransaction matches, the **earliest** one wins (a manually-entered row outranks an imported one; among imported rows, the earlier `StockImportBatch` wins), mirroring the Account side exactly.
+- `StockImportBatchRepository.confirmAll()` refuses (`StockImportBatchHasUnresolvedDuplicatesError`) if any batch StockTransaction still has a non-null `possibleDuplicateOfTransactionId`; otherwise flips every batch StockTransaction to `Confirmed`. Throws if the batch is already confirmed. `delete()` throws if the batch is already confirmed, otherwise removes its StockTransactions and the batch row.
+- `StockTransactionRepository.dismissSuspectedDuplicate(id)` clears `possibleDuplicateOfTransactionId` to null and changes nothing else — no `trustStatus` guard, mirroring `TransactionRepository.dismissSuspectedDuplicate()`.
+
+## Persistence requirements
+
+Persistence must support creating, retrieving, listing, updating, and deleting ShareTradingAccounts, and creating, retrieving, listing, updating, and deleting StockTransactions by ShareTradingAccount. Both are implemented for SQLite and Postgres (`src/db/repositories/`, `src/db/postgres/repositories/`), wired into `src/db/repository-factory.ts`. `ShareTradingAccountRepositoryPort.update()` throws `ShareTradingAccountNotFoundError` for an unknown id, mirroring `AccountRepositoryPort.update()`/`AccountNotFoundError`; `getDependentCounts()`/`delete()` guard against deleting a ShareTradingAccount that still has StockTransactions or StockImportBatches (`EntityHasDependentsError`, listing counts by name) — deliberately not relying on `stock_transactions.share_trading_account_id`'s DB-level `ON DELETE CASCADE`, the same reasoning `AccountRepository.delete()` uses for `transactions.account_id`. `StockTransactionRepositoryPort.update()`/`delete()` have no editability gate (see HTTP and UI contract above); `update()` throws `StockTransactionNotFoundError` for an unknown id, `delete()` on an unknown id is a no-op. Every one of these Postgres repository methods scopes by `(id, ownerId)`, same as every other owner-scoped write (`docs/adr/0006-drop-rls-for-app-layer-owner-filtering.md`).
+
+`StockImportBatchRepository`/`PgStockImportBatchRepository` (`StockImportBatchRepositoryPort`): `create(batch, lineItems)` atomically writes one `StockImportBatch` and its `Imported` StockTransactions in one transaction, mirroring `ImportBatchRepository.create()`'s pattern — including computing each line item's Suspected Duplicate match before writing; `getById`/`listAll`; `confirmAll(id)`; `delete(id)`. `stock_import_batches` (`id`, `shareTradingAccountId` FK `restrict`, `source`, `createdAt`, `confirmedAt`) has no closing-balance/BalanceSnapshot/Reconciliation columns at all — they don't apply. `stock_transactions.external_ref` (nullable text) and `stock_transactions.possible_duplicate_of_transaction_id` (nullable self-referencing FK, `on delete set null`) were added the same way as their `transactions` counterparts (`docs/specs/import.md`). `stock_transactions.trustStatus`/`importBatchId` were added via an additive migration after the base table shipped (SQLite: `drizzle/0012_spooky_tomorrow_man.sql`, hand-corrected because drizzle-kit's auto-generated table-rebuild tried to copy the two new columns from the old table before they existed — see that file; Postgres: `postgres/migrations/20260911140000_stock_import_batches.sql`, same bootstrap-order pattern `transactions.import_batch_id` used). The SQLite `importBatchId` FK's live constraint is `NO ACTION`, not the schema's declared `cascade` — `ALTER TABLE ADD COLUMN` can't carry that action into SQLite's FK list, same as `transactions.import_batch_id` (`docs/CODEMAP.md`); harmless because `StockImportBatchRepository.delete()` deletes a batch's StockTransactions explicitly before the batch row.
+
+## HTTP and UI contract
+
+Server Actions only — no `/api` JSON routes (`docs/adr/0002-server-actions-not-rest-api.md`).
+
+- `/share-trading-accounts/new` — create a ShareTradingAccount (Institution, account name, optional account number, free-text ISO currency code) — same form conventions as `/accounts/new`; a ShareTradingAccount's currencyCode is not editable after creation, matching Account.
+- `/share-trading-accounts/[id]` — Holdings (scrip/symbol code and net quantity, zero-quantity positions included) and the StockTransaction ledger in chronological order, with an "Add stock transaction" action.
+- `/share-trading-accounts/[id]/stock-transactions/new` — record a Buy or Sell: a Buy/Sell Type selector, scrip/symbol code (normalized to uppercase server-side so casing differences can't split one company's Holdings into two rows), an unsigned decimal quantity (whole shares only) and price per unit, full date+time, description.
+- `/share-trading-accounts/[id]/stock-transactions/[stockTransactionId]/edit` — edit a StockTransaction's fields (same form as `new`, prefilled); `/share-trading-accounts/[id]/stock-transactions/[stockTransactionId]/delete` — confirm-and-delete it, linked from the edit page's danger zone. Unlike Transaction, a StockTransaction has no Transfer/Adjustment-shaped linkage, so there is no editability gate: both Confirmed and Imported rows are editable/deletable, mirroring `/accounts/[id]/transactions/[transactionId]/edit`'s and `.../delete`'s conventions but without `assertEditable()` or `returnTo` (nothing links here but the ledger).
+- Listed under each Institution on `/` and `/institutions/[id]`, alongside Accounts and FixedDeposits.
+- `/share-trading-accounts/[id]/edit` — rename/change account number (`currencyCode` stays fixed, matching Account), mirroring `/accounts/[id]/edit` exactly. `/share-trading-accounts/[id]/delete` — dependency-gated delete (blocked while it still has StockTransactions or StockImportBatches, listed by name), mirroring `/accounts/[id]/delete`. UI review follow-up: earlier passes deliberately left ShareTradingAccount create-only, matching FixedDeposit's own no-edit/no-delete stance (`docs/adr/0003-fixed-deposit-maturity-inside-transfer-creation.md`) — but that ADR's actual reasoning is about FixedDeposit's immutable-principal/lifecycle math, which doesn't apply here: a ShareTradingAccount's Holdings are just summed StockTransactions, so renaming it or deleting an empty one doesn't touch anything analogous. Edit/delete are added now, following Account's pattern instead.
+- No BalanceSnapshot/Reconciliation equivalent — there is no bank-reported figure to compare a computed share position against in this pass.
+- MCP endpoint mounted on the existing Next.js server, same trust boundary as `docs/specs/import.md`'s Account-side tools (loopback-only local mode, MCP-access-token-authenticated cloud mode) — the four stock tools are registered on the same `McpServer` instance, not a separate endpoint.
+- `/stock-imports/[id]` — per-batch review, mirroring `/imports/[id]` (`docs/specs/import.md`'s HTTP and UI contract): a flagged line item shows a "Suspected duplicate" badge, a "View possible original" link to the StockTransaction it matched, and a "Not a duplicate — keep it" action (`dismiss-duplicate-actions.ts`) that clears the flag in place; "Confirm All" is disabled with inline text naming how many flagged rows remain while any are unresolved.
+
+Money fields (price per unit) take a decimal string, converted server-side to integer minor units via `getMinorUnitExponent` against the ShareTradingAccount's currency. Quantity is a decimal-shaped input (`<DecimalInput>`, per `docs/agents/mobile-ux.md`) but validated server-side as a positive whole number — fractional shares are out of scope.
+
+## Out of scope for this pass
+
+- Cash-leg bookkeeping — a Buy/Sell does not debit/credit any cash Account. Recording share trades is a standalone ledger, the same way `docs/specs/transactions.md`'s manually-entered Transactions don't require a matching bank feed.
+- Cost basis / realized gain tracking — Holdings report net quantity only, not money invested or profit/loss. The accounting method (average cost vs. FIFO) is a real, undecided choice, deferred rather than guessed.
+- Market valuation — no price feed exists anywhere in this codebase (`docs/adr/0001-transfer-as-single-entity-with-realized-fx-rate.md` makes the same call for FX); a Holding's value is never priced at a current market rate.
+- Email alert sync for broker trade-confirmation emails — MCP import only this pass (see Behavior above); not assumed to extend the same way later.
+
+## Acceptance criteria
+
+- An unknown Institution cannot be used to create a ShareTradingAccount.
+- An unknown ShareTradingAccount cannot be used to create a StockTransaction.
+- Holdings sum Buy/Sell quantity per scrip/symbol code exactly, across multiple companies on one ShareTradingAccount.
+- A fully-exited company's Holding remains listed at zero rather than disappearing.
+- Deleting an Institution is rejected while it still has a ShareTradingAccount.
+- `resolve_share_trading_account` with exactly one existing ShareTradingAccount matching the last-4-digit/institution-name claim returns it and creates nothing; no match returns `status: "unresolved"` and creates nothing — unless that same number/institution instead matches an existing Account, in which case nothing is created and the result (`status: "wrong-account-type"`) says to call `resolve_account` instead; more than one match creates nothing and returns every candidate (`status: "ambiguous"`).
+- `create_share_trading_account` without `confirmed: true` writes nothing; with confirmation it creates (or reuses a same-Institution last-4 match) the same way `create_account` does.
+- `stage_stock_import` against a ShareTradingAccount with a matching existing StockTransaction (same account, date, scrip code, type, quantity, price) flags it as a likely duplicate without altering any data.
+- `commit_stock_import` with an unknown `shareTradingAccountId`, an empty line-item list, a non-positive/fractional quantity, or a price that doesn't parse validly for the account's currency writes nothing.
+- A successful `commit_stock_import` creates exactly one unconfirmed `StockImportBatch` and its `Imported` StockTransactions (each with `importBatchId` set).
+- `confirmAll` flips every StockTransaction in the batch to `Confirmed` and creates no BalanceSnapshot/Reconciliation (there is none to create). `confirmAll`/`delete` on an already-confirmed batch throw without side effects.
+- `commit_stock_import` against a ShareTradingAccount with a matching existing StockTransaction still creates the new StockTransaction (it never rejects or skips a line item), with `possibleDuplicateOfTransactionId` set to the existing one's id.
+- `commit_stock_import` with a line item whose `externalRef` matches an existing StockTransaction's `externalRef` sets `possibleDuplicateOfTransactionId` to that StockTransaction, even when the date differs.
+- `confirmAll` on a batch with any StockTransaction still carrying a non-null `possibleDuplicateOfTransactionId` throws `StockImportBatchHasUnresolvedDuplicatesError` and writes nothing.
+- `dismissSuspectedDuplicate` clears a StockTransaction's `possibleDuplicateOfTransactionId` without changing any other field, after which `confirmAll` no longer refuses on that ShareTradingAccount.
+
+## Decision record
+
+See `docs/adr/0014-duplicate-imports-flagged-and-gated-at-confirm-not-blocked-at-commit.md` for the Suspected Duplicate design, which applies identically to this side.

@@ -1,0 +1,35 @@
+# Secrets / credentials — never upload to Vercel
+.env
+.env.*
+.env*.local
+*.pem
+*.key
+credentials.json
+**/secrets/**
+
+# Desktop / local packaging artifacts (not used on Vercel)
+electron
+dist
+scripts/package-electron.sh
+scripts/electron-after-pack.cjs
+scripts/release.sh
+scripts/release-steps.ts
+scripts/release-steps.test.ts
+
+# Accidental / design-only build artifacts
+.next-verify
+archive
+*.db
+*.db-journal
+# Root Supabase CLI project only — do not use bare `supabase` (that also
+# excludes src/lib/supabase and breaks the Vercel Next build).
+/supabase
+scripts
+node_modules
+
+# Agent / editor docs not needed at runtime
+AGENTS.md
+CLAUDE.md
+CONTEXT.md
+docs
+*.md

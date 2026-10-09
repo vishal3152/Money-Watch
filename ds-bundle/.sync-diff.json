@@ -1,0 +1,35 @@
+{
+  "styleChanged": false,
+  "anchorUsed": false,
+  "anchorReason": "not_provided",
+  "keyedBy": "renderHashes",
+  "unchanged": [],
+  "changed": [],
+  "added": [
+    "CollapsibleSectionList",
+    "DecimalInput",
+    "DeleteConfirmForm",
+    "LedgerFilter",
+    "SegmentedControl",
+    "SheetSelect",
+    "ToggleField"
+  ],
+  "removed": [],
+  "renderChurned": [],
+  "upload": {
+    "any": true,
+    "components": [
+      "CollapsibleSectionList",
+      "DecimalInput",
+      "DeleteConfirmForm",
+      "LedgerFilter",
+      "SegmentedControl",
+      "SheetSelect",
+      "ToggleField"
+    ],
+    "deletePaths": [],
+    "bundle": true,
+    "styling": true,
+    "aux": true
+  }
+}

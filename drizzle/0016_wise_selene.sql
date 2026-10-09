@@ -1,0 +1,1 @@
+ALTER TABLE `transactions` ADD `possible_duplicate_of_transaction_id` text REFERENCES transactions(id);

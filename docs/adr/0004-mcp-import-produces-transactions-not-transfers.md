@@ -1,0 +1,8 @@
+# MCP import produces plain Transactions, never Transfers
+
+The MCP-based statement importer (`docs/specs/import.md`) can create Transactions on the Account being imported, but never creates a Transfer, even when a statement line looks like a movement to another of the owner's own tracked Accounts. The importer's MCP server never sees the source file — the AI assistant parses it entirely client-side — so it has no reliable way to confirm a beneficiary Account without the assistant or owner naming it explicitly, and most "transfer-looking" statement lines aren't between the owner's own tracked Accounts at all (rent, bill payments, transfers to other people). Recording each leg as an independent Transaction keeps account balances correct either way, since balance computation only sums signed Transaction amounts per Account; what's lost is the Transfer entity's structural link and realized-FX-rate capture, which the owner can still get for a genuine internal movement by using the existing manual `/transfers/new` flow instead.
+
+## Considered Options
+
+- Cross-account matching: after importing both sides, look for a same-amount, same-date Transaction on another tracked Account and offer to merge them into a Transfer. Rejected — a fragile heuristic (FX timing, coincidental matches) and not requested for v1.
+- Having the assistant name a destination Account directly, with `commit_import` constructing a Transfer. Rejected — this would mean trusting an AI-supplied beneficiary Account for a structural, harder-to-undo entity. A wrong plain Transaction is a one-line fix or an `ImportBatch` undo; a wrong Transfer is two related, less obviously connected entries to unwind.

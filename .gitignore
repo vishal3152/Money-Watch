@@ -1,0 +1,48 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Next.js / build artifacts
+.next/
+.next-verify/
+dist/
+out/
+coverage/
+tsconfig.tsbuildinfo
+
+# Local SQLite databases
+*.db
+*.db-journal
+
+# OS
+.DS_Store
+
+# Agent / editor local state (never push)
+.claude/
+.cursor/
+.impeccable/
+.impecable/
+
+# Vercel local link state
+.vercel/
+
+# Secrets / local credentials — never commit
+.env
+.env.*
+.env*.local
+!.env.example
+.paisa-watch-env-stash/
+*.pem
+*.key
+credentials.json
+**/secrets/**
+
+.tmp/*
+.tmp*
+# Firebase local project link
+.firebaserc
+.vercel
+.env*
+CLAUDE.md
+AGENTS.md
+GEMINI.md

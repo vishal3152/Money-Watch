@@ -1,0 +1,1 @@
+ALTER TABLE `processed_email_alerts` ADD `failure_reason` text;

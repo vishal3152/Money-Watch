@@ -1,0 +1,14 @@
+[
+  {
+    "sheet": 1,
+    "components": [
+      "CollapsibleSectionList",
+      "DecimalInput",
+      "DeleteConfirmForm",
+      "LedgerFilter",
+      "SegmentedControl",
+      "SheetSelect",
+      "ToggleField"
+    ]
+  }
+]

@@ -1,0 +1,9 @@
+{
+  "installCommand": "ELECTRON_SKIP_BINARY_DOWNLOAD=1 pnpm install",
+  "crons": [
+    {
+      "path": "/api/cron/email-sync",
+      "schedule": "0 8 * * *"
+    }
+  ]
+}

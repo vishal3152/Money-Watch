@@ -1,0 +1,1 @@
+ALTER TABLE `fixed_deposits` ADD `name` text DEFAULT 'FixedDeposit' NOT NULL;

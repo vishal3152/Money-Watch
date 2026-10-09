@@ -1,0 +1,2371 @@
+:root {
+  color-scheme: light;
+  /* Figma Portfolio Global (152:2262) — see DESIGN.md */
+  --pw-bg: #f2f2f2;
+  --pw-bg-deep: #f2f2f2;
+  --pw-surface: #ffffff;
+  --pw-surface-2: #f2f2f2;
+  --pw-ink: #141c2e;
+  --pw-ink-strong: #17191c;
+  --pw-ink-heading: #141c2e;
+  --pw-ink-muted: rgba(20, 28, 46, 0.6);
+  --pw-border: rgba(20, 28, 46, 0.1);
+  --pw-border-strong: rgba(20, 28, 46, 0.18);
+  --pw-accent: #387ed1;
+  --pw-accent-2: #387ed1;
+  --pw-accent-hover: #2d6bb8;
+  --pw-accent-deep: #2d6bb8;
+  --pw-accent-soft: #387ed10f;
+  --pw-accent-ink: #17191c;
+  /* --pw-accent measures ~4.1:1 on white/--pw-bg — short of WCAG AA's 4.5:1 for normal text.
+     Reserve --pw-accent for backgrounds/large-scale/decorative use (buttons, borders, focus
+     rings); use this darker value (~5.4:1) for text and icons — links, status pills, tags. */
+  --pw-accent-text: #2d6bb8;
+  --pw-danger: #b42318;
+  --pw-danger-bg: #fef3f2;
+  --pw-success: #166534;
+  --pw-success-bg: #f0fdf4;
+  --pw-radius: 16px;
+  --pw-radius-sm: 8px;
+  --pw-radius-md: 12px;
+  --pw-shadow: 0 4px 12px -2px rgba(20, 28, 46, 0.08);
+  --pw-shadow-sm: 0 4px 12px -2px rgba(20, 28, 46, 0.08);
+  --pw-shadow-pop:
+    0 2px 8px rgba(56, 126, 209, 0.25), 0 4px 16px rgba(56, 126, 209, 0.15);
+  --pw-ease: cubic-bezier(0.4, 0, 0.2, 1);
+  /* Inter carries no CJK or Arabic glyphs, so those scripts fall through to the
+     platform families named here before reaching the generic sans-serif. */
+  --pw-font:
+    var(--font-inter-tight), var(--font-inter), system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC",
+    "Noto Sans CJK SC", "Geeza Pro", "Noto Sans Arabic", sans-serif;
+  /* Type scale — Figma Inter Tight (Body-1/2, Caption, Subtitle-1, Heading-5, Button/Large) */
+  --pw-text-caption: 0.75rem; /* 12 */
+  --pw-text-body-2: 0.875rem; /* 14 */
+  --pw-text-body: 1rem; /* 16 */
+  --pw-text-button: 1.0625rem; /* 17 */
+  --pw-text-subtitle: 1.125rem; /* 18 */
+  --pw-text-heading: 1.5rem; /* 24 */
+  --pw-leading-body: 1.5;
+  --pw-leading-body-2: 1.5;
+  --pw-leading-caption: 1.5;
+  --pw-leading-heading: 1.333;
+  --pw-header-h: 4.5rem;
+  /* Mobile-first content caps; desktop media queries widen these. */
+  --pw-content-form: 32rem;
+  --pw-content-wide: 40rem;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100%;
+  font-family: var(--pw-font);
+  font-size: var(--pw-text-body);
+  line-height: var(--pw-leading-body);
+  color: var(--pw-ink);
+  background: var(--pw-bg);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom)
+    env(safe-area-inset-left);
+}
+
+@keyframes pw-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pw-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pw-sheet-up {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+::selection {
+  background: color-mix(in srgb, var(--pw-accent) 28%, white);
+  color: var(--pw-ink);
+}
+
+a {
+  color: var(--pw-accent-text);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+}
+
+code {
+  overflow-wrap: anywhere;
+}
+
+a:hover {
+  color: var(--pw-accent-hover);
+}
+
+:focus-visible {
+  outline: 2px solid var(--pw-accent);
+  outline-offset: 3px;
+}
+
+.pw-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.pw-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: var(--pw-header-h);
+  padding: 0 clamp(1rem, 3vw, 2rem);
+  background: rgba(255, 255, 255, 0.9);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: box-shadow 300ms var(--pw-ease), background-color 300ms var(--pw-ease);
+}
+
+@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+  .pw-header {
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+}
+
+.pw-header-start {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.75rem, 3vw, 2rem);
+  min-width: 0;
+}
+
+.pw-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: inherit;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.pw-brand-mark {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  display: block;
+  overflow: visible;
+}
+
+.pw-brand-name {
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: var(--pw-ink-strong);
+}
+
+.pw-brand-name-lead {
+  color: var(--pw-accent-text);
+}
+
+.pw-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.pw-nav-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0.4rem 0.7rem;
+  border-radius: 0.55rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--pw-ink-muted);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color 150ms var(--pw-ease), color 150ms var(--pw-ease);
+}
+
+@media (hover: hover) {
+  .pw-nav-link:hover {
+    background: color-mix(in srgb, var(--pw-border) 70%, white);
+    color: var(--pw-ink-strong);
+  }
+}
+
+.pw-nav-link[data-active="true"] {
+  color: var(--pw-accent-text);
+  background: color-mix(in srgb, var(--pw-accent) 12%, white);
+}
+
+/* Hamburger trigger for the left nav drawer — inline `.pw-nav` covers wide viewports, so this
+   stays hidden until the `max-width: 640px` block below swaps the two. Selector combines with
+   `.pw-menu` (not just `.pw-nav-trigger` alone) so this `display: none` outranks `.pw-menu`'s
+   own `display: inline-flex` regardless of source order — same reason `.pw-lang-trigger` below
+   combines with `.pw-menu` rather than standing alone. */
+.pw-menu.pw-nav-trigger {
+  display: none;
+  flex-shrink: 0;
+}
+
+.pw-nav-trigger-icon {
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+.pw-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 0;
+  flex-shrink: 0;
+}
+
+.pw-header-email {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 9rem;
+  font-size: 0.85rem;
+  color: var(--pw-ink-muted);
+}
+
+.pw-menu {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 0;
+  border-radius: 0.55rem;
+  background: transparent;
+  color: var(--pw-ink);
+  cursor: pointer;
+  transition: background-color 150ms var(--pw-ease), transform 150ms var(--pw-ease);
+}
+
+@media (hover: hover) {
+  .pw-menu:hover {
+    background: color-mix(in srgb, var(--pw-border) 70%, white);
+  }
+}
+
+.pw-menu:active {
+  background: color-mix(in srgb, var(--pw-accent) 12%, var(--pw-border));
+  transform: scale(0.94);
+}
+
+.pw-menu-icon {
+  display: block;
+  width: 1.35rem;
+  height: 1rem;
+}
+
+.pw-menu.pw-lang-trigger {
+  width: auto;
+  padding: 0 0.55rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.pw-lang-label-short {
+  display: none;
+}
+
+.pw-main {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: clamp(2rem, 9vh, 5.5rem) 1.25rem 3rem;
+}
+
+.pw-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 4rem 0;
+}
+
+.pw-spinner {
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 3px solid var(--pw-border);
+  border-top-color: var(--pw-accent);
+  border-radius: 999px;
+  animation: pw-spin 0.7s linear infinite;
+}
+
+@keyframes pw-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Soft-lifted Operate surface — shared by task cards, dashboard, and detail. */
+.pw-card,
+.pw-dashboard,
+.pw-detail {
+  padding: 2.25rem 2rem 1.85rem;
+  background: var(--pw-surface);
+  border: 1px solid var(--pw-border);
+  border-radius: var(--pw-radius);
+  box-shadow: var(--pw-shadow);
+  animation: pw-fade-up 480ms var(--pw-ease) both;
+}
+
+@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+  .pw-card,
+  .pw-dashboard,
+  .pw-detail {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+}
+
+.pw-card {
+  width: min(100%, var(--pw-content-form));
+}
+
+.pw-card h1 {
+  margin: 0 0 1.75rem;
+  font-size: var(--pw-text-heading);
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: var(--pw-leading-heading);
+  color: var(--pw-ink);
+}
+
+/* Title + lede are one tight group; space lives under the lede. */
+.pw-card h1:has(+ .pw-detail-lede) {
+  margin-bottom: 0.4rem;
+}
+
+.pw-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  margin-bottom: 1.35rem;
+}
+
+.pw-field label,
+.pw-field-legend {
+  font-size: var(--pw-text-body);
+  font-weight: 500;
+  color: var(--pw-ink-heading);
+}
+
+.pw-required-mark {
+  margin-inline-start: 0.15em;
+  color: var(--pw-danger);
+  font-weight: 700;
+}
+
+.pw-field input,
+.pw-field select,
+.pw-sheet-trigger {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.55rem 0.75rem;
+  font: inherit;
+  font-size: 1rem;
+  color: var(--pw-ink);
+  caret-color: var(--pw-accent);
+  background: var(--pw-surface);
+  border: 1.5px solid var(--pw-border);
+  border-radius: var(--pw-radius-sm);
+  transition: border-color 120ms ease-out, box-shadow 150ms var(--pw-ease);
+}
+
+.pw-field select {
+  appearance: auto;
+  cursor: pointer;
+}
+
+.pw-field input:hover,
+.pw-field select:hover,
+.pw-sheet-trigger:hover:not(:disabled) {
+  border-color: var(--pw-border-strong);
+}
+
+.pw-field input:focus,
+.pw-field select:focus,
+.pw-sheet-trigger:focus-visible {
+  border-color: var(--pw-accent);
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--pw-accent) 16%, transparent);
+}
+
+.pw-sheet-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  text-align: start;
+  font: inherit;
+  font-size: 1rem;
+  color: var(--pw-ink);
+  background: var(--pw-surface);
+  border: 1.5px solid var(--pw-border);
+  border-radius: var(--pw-radius-sm);
+  cursor: pointer;
+}
+
+.pw-sheet-trigger:disabled {
+  color: var(--pw-ink-muted);
+  background: var(--pw-bg);
+  cursor: not-allowed;
+}
+
+.pw-sheet-trigger.is-invalid {
+  border-color: var(--pw-danger);
+}
+
+.pw-sheet-trigger-chevron {
+  color: var(--pw-ink-muted);
+  font-size: 0.85rem;
+}
+
+.pw-institutions-filter {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 0.65rem;
+  margin: 0.15rem 0 1.15rem;
+}
+
+.pw-institutions-filter > .pw-segmented {
+  flex: 0 1 auto;
+  width: max-content;
+  max-width: 100%;
+  grid-auto-columns: max-content;
+}
+
+.pw-institutions-search {
+  flex: 1 1 12rem;
+  max-width: 20rem;
+  min-width: 0;
+  min-height: 2.75rem;
+  padding: 0.55rem 0.75rem;
+  font: inherit;
+  font-size: 1rem;
+  color: var(--pw-ink);
+  caret-color: var(--pw-accent);
+  background: var(--pw-surface);
+  border: 1.5px solid var(--pw-border);
+  border-radius: var(--pw-radius-sm);
+  transition: border-color 120ms ease-out, box-shadow 150ms var(--pw-ease);
+}
+
+.pw-institutions-search:hover {
+  border-color: var(--pw-border-strong);
+}
+
+.pw-institutions-search:focus {
+  border-color: var(--pw-accent);
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--pw-accent) 16%, transparent);
+}
+
+.pw-segmented {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 0.35rem;
+  padding: 0.3rem;
+  background: var(--pw-bg);
+  border: 1px solid var(--pw-border);
+  border-radius: var(--pw-radius-sm);
+}
+
+.pw-segmented-option {
+  min-height: 2.75rem;
+  padding: 0.55rem 0.65rem;
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--pw-ink-muted);
+  background: transparent;
+  border: 0;
+  border-radius: calc(var(--pw-radius-sm) - 2px);
+  cursor: pointer;
+}
+
+.pw-segmented-option.is-selected {
+  color: var(--pw-ink);
+  background: var(--pw-surface);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+.pw-segmented-option:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.pw-sheet-root {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.pw-sheet-backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  padding: 0;
+  background: rgba(23, 25, 28, 0.42);
+  cursor: pointer;
+  animation: pw-fade-in 180ms var(--pw-ease) both;
+}
+
+.pw-sheet {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 32rem);
+  max-height: min(70vh, 28rem);
+  display: flex;
+  flex-direction: column;
+  background: var(--pw-surface);
+  border-radius: 1.25rem 1.25rem 0 0;
+  box-shadow: 0 -8px 28px rgba(0, 0, 0, 0.16);
+  padding-bottom: env(safe-area-inset-bottom);
+  animation: pw-sheet-up 220ms var(--pw-ease) both;
+}
+
+.pw-sheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--pw-border);
+}
+
+.pw-sheet-header h2 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.pw-sheet-close {
+  min-height: 2.75rem;
+  min-width: 2.75rem;
+  padding: 0.45rem 0.85rem;
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--pw-accent-text);
+  background: transparent;
+  border: 0;
+  border-radius: var(--pw-radius-sm);
+  cursor: pointer;
+}
+
+.pw-sheet-list {
+  margin: 0;
+  padding: 0.35rem 0 calc(0.75rem + env(safe-area-inset-bottom));
+  list-style: none;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.pw-sheet-option {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.85rem 1rem;
+  font: inherit;
+  font-size: 1rem;
+  text-align: start;
+  color: var(--pw-ink);
+  background: transparent;
+  border: 0;
+  border-top: 1px solid var(--pw-border);
+  cursor: pointer;
+  transition: background-color 120ms var(--pw-ease);
+}
+
+.pw-sheet-option:active {
+  background: color-mix(in srgb, var(--pw-accent) 10%, white);
+}
+
+@media (hover: hover) {
+  .pw-sheet-option:hover {
+    background: color-mix(in srgb, var(--pw-accent) 6%, var(--pw-surface));
+  }
+}
+
+.pw-sheet-list li:first-child .pw-sheet-option {
+  border-top: 0;
+}
+
+.pw-sheet-option.is-selected {
+  font-weight: 700;
+  color: var(--pw-accent-text);
+  background: color-mix(in srgb, var(--pw-accent) 8%, white);
+}
+
+/* Left nav drawer (mobile Dashboard/Imports/Settings) — same fixed-overlay shape as
+   `.pw-sheet-*` above, portaled to `document.body` for the same backdrop-filter
+   containing-block reason (see the comment in `header-language-switcher.tsx`), but sliding
+   in from the inline-start edge instead of up from the bottom. */
+.pw-nav-drawer-root {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+}
+
+.pw-nav-drawer-backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  padding: 0;
+  background: rgba(23, 25, 28, 0.42);
+  cursor: pointer;
+  animation: pw-fade-in 180ms var(--pw-ease) both;
+}
+
+.pw-nav-drawer-panel {
+  position: relative;
+  z-index: 1;
+  width: min(80vw, 19rem);
+  max-width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--pw-surface);
+  box-shadow: 8px 0 28px rgba(0, 0, 0, 0.16);
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  animation: pw-nav-drawer-in 220ms var(--pw-ease) both;
+}
+
+@keyframes pw-nav-drawer-in {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+[dir="rtl"] .pw-nav-drawer-panel {
+  animation-name: pw-nav-drawer-in-rtl;
+}
+
+@keyframes pw-nav-drawer-in-rtl {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.pw-nav-drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--pw-border);
+}
+
+.pw-nav-drawer-header h2 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.pw-nav-drawer-close {
+  min-height: 2.75rem;
+  min-width: 2.75rem;
+  padding: 0.45rem 0.85rem;
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--pw-accent-text);
+  background: transparent;
+  border: 0;
+  border-radius: var(--pw-radius-sm);
+  cursor: pointer;
+}
+
+.pw-nav-drawer-list {
+  margin: 0;
+  padding: 0.35rem 0;
+  list-style: none;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.pw-nav-drawer-link {
+  display: flex;
+  align-items: center;
+  min-height: 3rem;
+  padding: 0.85rem 1.1rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--pw-ink);
+  text-decoration: none;
+  transition: background-color 120ms var(--pw-ease);
+}
+
+.pw-nav-drawer-link:active {
+  background: color-mix(in srgb, var(--pw-accent) 10%, white);
+}
+
+@media (hover: hover) {
+  .pw-nav-drawer-link:hover {
+    background: color-mix(in srgb, var(--pw-accent) 6%, var(--pw-surface));
+    color: var(--pw-ink);
+  }
+}
+
+.pw-nav-drawer-link[data-active="true"] {
+  font-weight: 700;
+  color: var(--pw-accent-text);
+  background: color-mix(in srgb, var(--pw-accent) 8%, white);
+}
+
+.pw-toggle-field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 2.75rem;
+  margin-bottom: 1.35rem;
+  cursor: pointer;
+}
+
+.pw-toggle-field-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.pw-toggle-field-label {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--pw-ink-heading);
+}
+
+.pw-toggle-input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+}
+
+.pw-toggle-track {
+  position: relative;
+  flex: 0 0 auto;
+  width: 3.25rem;
+  height: 1.9rem;
+  border-radius: 999px;
+  background: var(--pw-border-strong);
+  transition: background-color 120ms ease-out;
+}
+
+.pw-toggle-thumb {
+  position: absolute;
+  top: 0.2rem;
+  inset-inline-start: 0.2rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 999px;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
+  transition: transform 120ms ease-out;
+}
+
+.pw-toggle-input:checked + .pw-toggle-track {
+  background: var(--pw-accent);
+}
+
+.pw-toggle-input:checked + .pw-toggle-track .pw-toggle-thumb {
+  transform: translateX(1.35rem);
+}
+
+.pw-toggle-input:focus-visible + .pw-toggle-track {
+  outline: 2px solid var(--pw-accent);
+  outline-offset: 3px;
+}
+
+/* Compact variant of the same switch for inline use in a filter bar (unlike .pw-toggle-field,
+   which is a full-width form-row with space-between label/switch spacing). */
+.pw-inline-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 2.75rem;
+  padding: 0 0.15rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--pw-ink-muted);
+  cursor: pointer;
+}
+
+.pw-choice-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.35rem;
+}
+
+.pw-choice-chip {
+  min-height: 2.75rem;
+  padding: 0.45rem 0.85rem;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--pw-ink);
+  background: var(--pw-surface);
+  border: 1px solid var(--pw-border);
+  border-radius: var(--pw-radius-sm);
+  cursor: pointer;
+  transition: background-color 150ms var(--pw-ease), border-color 150ms var(--pw-ease), transform 100ms var(--pw-ease);
+}
+
+.pw-choice-chip:active {
+  transform: scale(0.96);
+}
+
+.pw-choice-chip.is-selected {
+  color: var(--pw-accent-text);
+  border-color: color-mix(in srgb, var(--pw-accent) 45%, var(--pw-border));
+  background: color-mix(in srgb, var(--pw-accent) 8%, white);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--pw-accent) 20%, transparent);
+}
+
+.pw-field input[aria-invalid="true"] {
+  border-color: var(--pw-danger);
+}
+
+.pw-field input:read-only,
+.pw-field select:disabled,
+.pw-field input:disabled {
+  color: var(--pw-ink-muted);
+  background: var(--pw-bg);
+  border-color: var(--pw-border);
+  cursor: not-allowed;
+}
+
+.pw-field input::placeholder {
+  color: var(--pw-ink-muted);
+}
+
+.pw-field-error {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--pw-danger);
+}
+
+.pw-field-help {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--pw-ink-muted);
+}
+
+.pw-field-row {
+  display: flex;
+  align-items: stretch;
+  gap: 0.75rem;
+}
+
+.pw-field-row input {
+  flex: 1 1 auto;
+}
+
+.pw-checkbox-field {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  margin-bottom: 1.35rem;
+}
+
+.pw-checkbox-field input[type="checkbox"] {
+  flex-shrink: 0;
+  width: 1.15rem;
+  height: 1.15rem;
+  min-height: 0;
+  margin-top: 0.2rem;
+  accent-color: var(--pw-accent);
+  cursor: pointer;
+}
+
+.pw-checkbox-field-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.pw-checkbox-field label {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--pw-ink-heading);
+  cursor: pointer;
+}
+
+.pw-banner-error {
+  margin: 0 0 1rem;
+  padding: 0.75rem 0.9rem;
+  color: var(--pw-danger);
+  background: var(--pw-danger-bg);
+  border-radius: var(--pw-radius-sm);
+}
+
+.pw-banner-success {
+  margin: 0 0 1rem;
+  padding: 0.75rem 0.9rem;
+  color: var(--pw-success);
+  background: var(--pw-success-bg);
+  border-radius: var(--pw-radius-sm);
+}
+
+.pw-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 3.25rem;
+  margin-top: 0.75rem;
+  padding: 0.8rem 1rem;
+  font: inherit;
+  font-size: var(--pw-text-button);
+  font-weight: 500;
+  letter-spacing: 0.027em;
+  line-height: 1.294;
+  color: #ffffff;
+  background: var(--pw-accent);
+  border: 0;
+  border-radius: var(--pw-radius-md);
+  cursor: pointer;
+  box-shadow:
+    inset 0 2px 1px rgba(255, 255, 255, 0.25), inset 0 -2px 1px rgba(0, 0, 0, 0.25),
+    var(--pw-shadow-pop);
+  transition: box-shadow 300ms var(--pw-ease), transform 300ms var(--pw-ease),
+    background-color 300ms var(--pw-ease);
+}
+
+@media (hover: hover) {
+  .pw-button:hover:not(:disabled) {
+    transform: translateY(-1px);
+    background: var(--pw-accent-hover);
+    box-shadow:
+      inset 0 2px 1px rgba(255, 255, 255, 0.25), inset 0 -2px 1px rgba(0, 0, 0, 0.25),
+      0 4px 12px rgba(56, 126, 209, 0.3), 0 8px 24px rgba(56, 126, 209, 0.2);
+  }
+}
+
+.pw-button:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(56, 126, 209, 0.3);
+}
+
+.pw-button:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.pw-button-danger {
+  background: var(--pw-danger);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--pw-danger) 28%, transparent);
+}
+
+@media (hover: hover) {
+  .pw-button-danger:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--pw-danger) 85%, black);
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--pw-danger) 35%, transparent);
+  }
+}
+
+.pw-button-secondary {
+  width: auto;
+  min-height: 2.75rem;
+  margin-top: 0;
+  padding-inline: 1rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--pw-ink);
+  background: var(--pw-surface);
+  border: 1.5px solid var(--pw-border);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+@media (hover: hover) {
+  .pw-button-secondary:hover:not(:disabled) {
+    background: #f9fafb;
+    border-color: var(--pw-border-strong);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+}
+
+.pw-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 2.75rem;
+  margin: -0.35rem 0 0.9rem -0.35rem;
+  padding: 0.35rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--pw-ink-muted);
+  text-decoration: none;
+  background: none;
+  border: 0;
+  border-radius: var(--pw-radius-sm);
+  cursor: pointer;
+}
+
+.pw-back-link:hover {
+  color: var(--pw-accent-text);
+}
+
+/* A <button> (opens a sheet, not a navigation) styled to read exactly like the
+ * plain links elsewhere on the screen, per the base `a`/`a:hover` rule. */
+.pw-text-link-trigger {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0 0.35rem;
+  margin: -0.35rem -0.35rem -0.35rem 0;
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--pw-accent-text);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+  background: none;
+  border: 0;
+  border-radius: var(--pw-radius-sm);
+  cursor: pointer;
+}
+
+.pw-text-link-trigger:hover {
+  color: var(--pw-accent-hover);
+}
+
+.pw-back-link svg {
+  width: 0.8rem;
+  height: 0.8rem;
+  flex-shrink: 0;
+}
+
+.pw-detail {
+  width: min(100%, var(--pw-content-wide));
+}
+
+.pw-detail h1,
+.pw-dashboard h1 {
+  margin: 0 0 0.4rem;
+  font-size: var(--pw-text-heading);
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: var(--pw-leading-heading);
+  color: var(--pw-ink);
+}
+
+.pw-detail-lede {
+  margin: 0 0 1.75rem;
+  color: var(--pw-ink-muted);
+  font-size: var(--pw-text-body-2);
+  line-height: var(--pw-leading-body-2);
+}
+
+.pw-detail-header {
+  margin-bottom: 1.35rem;
+}
+
+.pw-detail-header h1 {
+  margin-bottom: 0.3rem;
+}
+
+.pw-detail-header .pw-detail-lede {
+  margin-bottom: 0;
+}
+
+/* Edit/delete as icon buttons beside the heading, instead of full-width
+   buttons further down the screen — better use of space than a dedicated
+   action row plus a whole danger-zone row for two single actions. */
+.pw-detail-heading-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.3rem;
+}
+
+.pw-detail-heading-row h1 {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin-bottom: 0;
+}
+
+.pw-detail-heading-actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+/* Text trigger shares the same 44px hit height as `.pw-menu` so "+ Account",
+   edit, and delete read as one aligned action cluster. */
+.pw-detail-heading-actions .pw-text-link-trigger {
+  height: 2.75rem;
+  min-height: 2.75rem;
+  padding: 0 0.4rem;
+  margin: 0;
+  margin-inline-end: 0.15rem;
+  white-space: nowrap;
+}
+
+.pw-menu-danger {
+  color: var(--pw-danger);
+}
+
+/* Own class rather than `.pw-menu-icon` — edit/delete are actions, not a direction, so unlike
+   the back chevron/sign-out arrow they must not mirror under `[dir="rtl"]`. Square (`.pw-menu-icon`
+   is a non-square 1.35rem × 1rem sized for its one existing icon), sized to fill `.pw-menu`. */
+.pw-detail-icon {
+  display: block;
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.pw-section-note {
+  margin-bottom: 0.85rem;
+  font-size: 0.875rem;
+}
+
+.pw-detail-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.2rem 0.45rem;
+}
+
+.pw-detail-meta a {
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.pw-detail-meta a:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+}
+
+.pw-meta-sep {
+  color: color-mix(in srgb, var(--pw-ink-muted) 55%, var(--pw-border));
+  user-select: none;
+}
+
+.pw-login-mode {
+  margin-bottom: 1.5rem;
+}
+
+.pw-login-alt {
+  margin-top: 1.5rem;
+}
+
+.pw-login-alt-rule {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin: 0 0 1rem;
+  color: var(--pw-ink-muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.pw-login-alt-rule::before,
+.pw-login-alt-rule::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--pw-border);
+}
+
+.pw-login-google {
+  display: inline-flex;
+  width: 100%;
+  gap: 0.65rem;
+  margin-top: 0;
+  min-height: 3.25rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.pw-login-google-mark {
+  flex-shrink: 0;
+}
+
+.pw-section {
+  margin-bottom: 2rem;
+}
+
+.pw-institution-section {
+  margin-bottom: 0;
+  border-radius: var(--pw-radius-sm);
+}
+
+.pw-institution-section + .pw-institution-section {
+  margin-top: 0;
+}
+
+.pw-institution-section--alt {
+  background: color-mix(in srgb, var(--pw-ink) 3.5%, var(--pw-surface));
+}
+
+.pw-institution-section > .pw-section-heading {
+  margin: 0;
+  min-height: 2.75rem;
+  padding: 0.35rem 0.55rem;
+}
+
+.pw-institution-section > h2 {
+  margin: 0;
+  min-height: 2.75rem;
+  padding: 0.55rem;
+  display: flex;
+  align-items: center;
+}
+
+.pw-institution-section > .pw-section-heading h2,
+.pw-institution-section > h2 {
+  font-size: var(--pw-text-body);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
+.pw-institution-section > .pw-section-heading h2 a,
+.pw-institution-section > h2 a {
+  color: var(--pw-accent-text);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.pw-institution-section > .pw-empty {
+  padding: 0 0.55rem 0.65rem;
+}
+
+.pw-institution-section > .pw-list {
+  margin-top: 0;
+  border-radius: 0 0 var(--pw-radius-sm) var(--pw-radius-sm);
+}
+
+.pw-section-heading--expandable {
+  cursor: pointer;
+}
+
+.pw-section + .pw-section {
+  margin-top: 0.25rem;
+}
+
+.pw-section:last-of-type {
+  margin-bottom: 1.5rem;
+}
+
+.pw-section h2 {
+  margin: 0 0 0.65rem;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--pw-ink-heading);
+}
+
+.pw-mcp-steps {
+  margin: 1.25rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.pw-mcp-step {
+  margin: 0;
+  padding: 1rem 1rem 0.85rem;
+  border: 1px solid var(--pw-border);
+  border-radius: var(--pw-radius-sm);
+  background: var(--pw-bg);
+}
+
+.pw-mcp-step-title,
+.pw-mcp-step h2.pw-mcp-step-title {
+  margin: 0 0 0.55rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--pw-ink-muted);
+}
+
+.pw-mcp-step .pw-detail-lede {
+  margin-bottom: 0.85rem;
+}
+
+.pw-mcp-code {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  margin-bottom: 0.35rem;
+}
+
+.pw-mcp-code-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.pw-mcp-code-toolbar .pw-field-help {
+  margin: 0;
+}
+
+.pw-copy-button {
+  flex: 0 0 auto;
+  min-height: 2.75rem;
+  min-width: 5.5rem;
+  padding-inline: 1rem;
+}
+
+.pw-mcp-code-pre {
+  margin: 0;
+  padding: 0.85rem 0.95rem;
+  overflow-x: auto;
+  border: 1px solid var(--pw-border);
+  border-radius: var(--pw-radius-sm);
+  background: var(--pw-surface);
+  font-size: 0.82rem;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.pw-mcp-code-pre code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
+  color: var(--pw-ink-strong);
+}
+
+.pw-mcp-token-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-top: 0.35rem;
+}
+
+.pw-mcp-token-actions .pw-button {
+  margin-top: 0.35rem;
+}
+
+.pw-section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin: 0 0 0.65rem;
+}
+
+.pw-section-heading h2 {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+}
+
+.pw-section-heading-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  flex: 0 0 auto;
+}
+
+.pw-section-count {
+  margin-inline-start: 0.45rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--pw-ink-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.pw-section-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0 0.55rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--pw-accent-text);
+  text-decoration: none;
+  border-radius: var(--pw-radius-sm);
+}
+
+.pw-section-action:hover {
+  color: var(--pw-accent-hover);
+  background: color-mix(in srgb, var(--pw-accent) 8%, white);
+}
+
+.pw-section-toggle {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  margin: -0.4rem -0.35rem -0.4rem 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--pw-radius-sm);
+  background: transparent;
+  color: var(--pw-ink-muted);
+  cursor: pointer;
+}
+
+.pw-section-heading-actions .pw-section-toggle {
+  margin-inline-start: 0;
+}
+
+.pw-section-toggle:hover {
+  color: var(--pw-accent-text);
+  background: color-mix(in srgb, var(--pw-accent) 8%, white);
+}
+
+.pw-section-toggle svg {
+  width: 1rem;
+  height: 1rem;
+  transition: transform 180ms ease-out;
+}
+
+.pw-section-toggle[aria-expanded="false"] svg {
+  transform: rotate(-90deg);
+}
+
+/* Whole-row toggle for a heading with no Link of its own (e.g. Dashboard's "Add"
+ * actions) — the label itself is the button, not just the trailing chevron. */
+.pw-section-heading-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  width: 100%;
+  min-height: 2.75rem;
+  margin: -0.4rem -0.35rem -0.4rem 0;
+  padding: 0.4rem 0.35rem 0.4rem 0;
+  border: 0;
+  border-radius: var(--pw-radius-sm);
+  background: transparent;
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--pw-ink-heading);
+  text-align: start;
+  cursor: pointer;
+}
+
+.pw-section-heading-button:hover {
+  color: var(--pw-accent-text);
+  background: color-mix(in srgb, var(--pw-accent) 8%, white);
+}
+
+.pw-section-heading-button svg {
+  flex: 0 0 auto;
+  width: 1rem;
+  height: 1rem;
+  color: var(--pw-ink-muted);
+  transition: transform 180ms ease-out;
+}
+
+.pw-section-heading-button[aria-expanded="false"] svg {
+  transform: rotate(-90deg);
+}
+
+/* Recessed wells inside soft-lifted panels — not nested elevated cards. */
+.pw-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid var(--pw-border);
+  border-radius: var(--pw-radius-sm);
+  background: var(--pw-bg);
+  overflow: hidden;
+}
+
+.pw-list li {
+  border-top: 1px solid var(--pw-border);
+}
+
+.pw-list li:first-child {
+  border-top: 0;
+}
+
+.pw-list > li > a,
+.pw-list > li > span {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 2.75rem;
+  padding: 0.9rem 1rem;
+  color: inherit;
+  text-decoration: none;
+  transition: background-color 150ms var(--pw-ease);
+}
+
+/* Unresolved email alert: an alert's own description is its title here and a bank's reference
+   strings run long, so wrap it rather than letting it slide under the badge. */
+.pw-unresolved-alert-title {
+  overflow-wrap: anywhere;
+}
+
+/* The correct-and-import form stays folded away until tapped, so the review queue reads as a list
+   first (docs/agents/mobile-ux.md's progressive disclosure). */
+.pw-list > li > .pw-unresolved-alert-review > summary {
+  display: flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0 1rem 0.9rem;
+  color: var(--pw-accent);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.pw-unresolved-alert-resolve {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0 1rem 0.9rem;
+}
+
+p.pw-unresolved-alert-resolve {
+  margin: 0;
+}
+
+.pw-unresolved-alert-resolve .pw-field {
+  margin-bottom: 0.5rem;
+}
+
+.pw-unresolved-alert-resolve .pw-button {
+  width: 100%;
+  min-height: 2.75rem;
+}
+
+@media (hover: hover) {
+  .pw-list a:hover {
+    background: color-mix(in srgb, var(--pw-accent) 7%, var(--pw-bg));
+  }
+}
+
+.pw-list a:active {
+  background: color-mix(in srgb, var(--pw-accent) 13%, var(--pw-bg));
+}
+
+.pw-list.pw-list-paged {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--pw-accent) 40%, var(--pw-border)) transparent;
+}
+
+.pw-list > li.pw-list-more-peek {
+  height: 0.85rem;
+  padding: 0;
+  border-top: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    color-mix(in srgb, var(--pw-ink) 8%, var(--pw-surface))
+  );
+  pointer-events: none;
+}
+
+.pw-list.pw-list-paged::-webkit-scrollbar {
+  width: 0.45rem;
+}
+
+.pw-list.pw-list-paged::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--pw-accent) 40%, var(--pw-border));
+  border-radius: 999px;
+}
+
+.pw-empty {
+  margin: 0;
+  padding: 1rem 1.05rem;
+  color: var(--pw-ink-muted);
+  border: 1px dashed var(--pw-border);
+  border-radius: var(--pw-radius-sm);
+  background: var(--pw-bg);
+  font-size: 0.95rem;
+}
+
+.pw-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 0.5rem;
+}
+
+/* Submit buttons in action rows match sibling action chips, not the
+   full-width form CTA (.pw-button defaults to 3.25rem / width:100%). */
+.pw-actions > form {
+  display: flex;
+  margin: 0;
+}
+
+.pw-actions .pw-button {
+  width: auto;
+  min-height: 2.75rem;
+  margin-top: 0;
+  padding: 0.55rem 0.95rem;
+  border-radius: 0.6rem;
+}
+
+/* Stacks a create/edit .pw-card with trailing actions below it (e.g. a
+   danger zone) — .pw-main centers its children as a flex row, so without
+   this wrapper a second child renders beside the card instead of under it. */
+.pw-form-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: min(100%, var(--pw-content-form));
+}
+
+.pw-sticky-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  margin: 1.75rem -2rem -1.85rem;
+  padding: 0.95rem 2rem calc(0.95rem + env(safe-area-inset-bottom));
+  background: color-mix(in srgb, var(--pw-surface) 88%, var(--pw-bg));
+  border-top: 1px solid var(--pw-border);
+  border-radius: 0 0 var(--pw-radius) var(--pw-radius);
+}
+
+/* Secondary action chips match Soft Ledger secondary buttons (ink, not accent). */
+.pw-actions a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0.55rem 0.95rem;
+  font-weight: 600;
+  color: var(--pw-ink);
+  text-decoration: none;
+  border: 1px solid var(--pw-border);
+  border-radius: 0.6rem;
+  background: var(--pw-surface);
+  transition: background-color 150ms var(--pw-ease), border-color 150ms var(--pw-ease), transform 150ms var(--pw-ease);
+}
+
+@media (hover: hover) {
+  .pw-actions a:hover {
+    background: color-mix(in srgb, var(--pw-accent) 6%, white);
+  }
+}
+
+.pw-actions a:active {
+  transform: scale(0.98);
+}
+
+.pw-actions a.pw-danger-link {
+  color: var(--pw-danger);
+  border-color: color-mix(in srgb, var(--pw-danger) 30%, var(--pw-border));
+}
+
+@media (hover: hover) {
+  .pw-actions a.pw-danger-link:hover {
+    background: color-mix(in srgb, var(--pw-danger) 8%, white);
+  }
+}
+
+/* Button equivalent of .pw-actions a — a <button> (a Server Action submit, not a
+   navigation) needs its own reset since it doesn't inherit anchor styling. */
+.pw-actions button.pw-action-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0.55rem 0.95rem;
+  font: inherit;
+  font-weight: 600;
+  color: var(--pw-ink);
+  border: 1px solid var(--pw-border);
+  border-radius: 0.6rem;
+  background: var(--pw-surface);
+  cursor: pointer;
+  transition: background-color 150ms var(--pw-ease), border-color 150ms var(--pw-ease), transform 150ms var(--pw-ease);
+}
+
+@media (hover: hover) {
+  .pw-actions button.pw-action-chip:hover {
+    background: color-mix(in srgb, var(--pw-accent) 6%, white);
+  }
+}
+
+.pw-actions button.pw-action-chip:active {
+  transform: scale(0.98);
+}
+
+.pw-actions button.pw-action-chip:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.pw-actions a.pw-action-primary {
+  color: #ffffff;
+  background: var(--pw-accent);
+  border-color: var(--pw-accent);
+  font-size: var(--pw-text-button);
+  font-weight: 500;
+  letter-spacing: 0.027em;
+  box-shadow:
+    inset 0 2px 1px rgba(255, 255, 255, 0.25), inset 0 -2px 1px rgba(0, 0, 0, 0.25),
+    var(--pw-shadow-pop);
+}
+
+@media (hover: hover) {
+  .pw-actions a.pw-action-primary:hover {
+    background: var(--pw-accent-hover);
+    border-color: var(--pw-accent-hover);
+  }
+}
+
+.pw-danger-zone {
+  margin-top: 2rem;
+  padding-top: 1.35rem;
+  border-top: 1px solid var(--pw-border);
+}
+
+.pw-dashboard {
+  width: min(100%, var(--pw-content-wide));
+}
+
+.pw-dashboard > .pw-section:last-of-type {
+  margin-bottom: 1.25rem;
+}
+
+.pw-balance-block {
+  margin-bottom: 1.75rem;
+}
+
+.pw-balance {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 1rem 1.15rem 1.05rem;
+  background: var(--pw-bg);
+  border: 1px solid var(--pw-border);
+  border-radius: var(--pw-radius-sm);
+}
+
+.pw-balance-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--pw-ink-muted);
+}
+
+.pw-balance-figure {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.5rem;
+  min-width: 0;
+}
+
+.pw-balance-value {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  color: var(--pw-ink-strong);
+}
+
+.pw-balance-currency {
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--pw-ink-muted);
+}
+
+.pw-currency-total-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
+  gap: 0.5rem;
+  list-style: none;
+  margin: 0.55rem 0 0;
+  padding: 0;
+}
+
+.pw-currency-total-card {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.2rem;
+  min-width: 0;
+  padding: 0.45rem 0.7rem 0.5rem;
+  background: var(--pw-bg);
+  border: 1px solid var(--pw-border);
+  border-radius: var(--pw-radius-sm);
+}
+
+.pw-currency-total-card--negative {
+  background: color-mix(in srgb, var(--pw-danger-bg) 65%, var(--pw-bg));
+  border-color: color-mix(in srgb, var(--pw-danger) 22%, var(--pw-border));
+}
+
+.pw-currency-total-topline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem 0.5rem;
+  min-width: 0;
+}
+
+.pw-currency-total-code {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--pw-ink-muted);
+  line-height: 1.2;
+}
+
+.pw-currency-total-meta {
+  font-size: 0.75rem;
+  color: var(--pw-ink-muted);
+  line-height: 1.25;
+}
+
+.pw-currency-total-value {
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+  text-align: start;
+  color: var(--pw-ink-strong);
+  overflow-wrap: anywhere;
+}
+
+.pw-currency-total-value--negative {
+  color: var(--pw-danger);
+}
+
+.pw-facts {
+  margin: 0;
+  border: 1px solid var(--pw-border);
+  border-radius: var(--pw-radius-sm);
+  background: var(--pw-bg);
+  overflow: hidden;
+}
+
+.pw-facts > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 1rem;
+  border-top: 1px solid var(--pw-border);
+}
+
+.pw-facts > div:first-child {
+  border-top: 0;
+}
+
+.pw-facts dt {
+  font-size: 0.9rem;
+  color: var(--pw-ink-muted);
+}
+
+.pw-facts dd {
+  margin: 0;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+}
+
+.pw-facts dd.pw-value-alert {
+  color: var(--pw-danger);
+}
+
+.pw-fieldset {
+  margin: 0 0 1.5rem;
+  padding: 1.1rem 1rem 0.25rem;
+  border: 1px solid var(--pw-border);
+  border-radius: var(--pw-radius-sm);
+  background: var(--pw-bg);
+}
+
+.pw-fieldset legend {
+  padding: 0 0.4rem;
+  margin-inline-start: -0.4rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--pw-ink-muted);
+}
+
+.pw-resolution-form {
+  margin-top: 1rem;
+  padding-top: 1.25rem;
+  border-top: 1px dashed var(--pw-border);
+}
+
+.pw-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.1rem 0.5rem;
+  margin-inline-start: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--pw-danger);
+  background: var(--pw-danger-bg);
+  border-radius: 999px;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--pw-danger) 18%, transparent);
+}
+
+.pw-category-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.1rem 0.5rem;
+  font-weight: 600;
+  color: var(--pw-ink-muted);
+  background: var(--pw-bg);
+  border: 1px solid var(--pw-border);
+  border-radius: 999px;
+}
+
+/* Was its own <Link> to the Transfer/Reconciliation before the whole ledger row
+ * became the tap target (docs/agents/mobile-ux.md) — now a plain badge, since a
+ * nested <a> inside the row's own <a> isn't valid. */
+.pw-item-tag-text {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.1rem 0.5rem;
+  font-weight: 600;
+  color: var(--pw-accent-text);
+  background: color-mix(in srgb, var(--pw-accent) 8%, var(--pw-bg));
+  border: 1px solid var(--pw-border);
+  border-radius: 999px;
+}
+
+/* Suspected Duplicate flag (CONTEXT.md) — tinted like .pw-danger-link, not solid, since it's a
+   review flag the owner resolves, not a hard error. */
+.pw-duplicate-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.1rem 0.5rem;
+  font-weight: 600;
+  color: var(--pw-danger);
+  background: var(--pw-danger-bg);
+  border: 1px solid color-mix(in srgb, var(--pw-danger) 30%, var(--pw-border));
+  border-radius: 999px;
+}
+
+.pw-item-title {
+  min-width: 0;
+  flex: 1 1 auto;
+  font-weight: 600;
+  /* A Transaction description can be a long unbroken bank reference string (NEFT/ACH message
+     text, no spaces) — without this it overflows past the title column's shrunk width instead
+     of wrapping, sliding under the amount/tags next to it. Same fix as .pw-unresolved-alert-title
+     for the same failure mode. */
+  overflow-wrap: anywhere;
+}
+
+.pw-item-sub {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.825rem;
+  font-weight: 400;
+  color: var(--pw-ink-muted);
+}
+
+.pw-item-amount {
+  flex: 0 0 auto;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  text-align: end;
+  white-space: nowrap;
+}
+
+.pw-item-amount--negative {
+  color: var(--pw-danger);
+}
+
+.pw-amount-direction {
+  display: inline-block;
+  margin-inline-end: 0.2rem;
+  font-weight: 700;
+}
+
+.pw-amount-direction--debit {
+  color: var(--pw-danger);
+}
+
+.pw-amount-direction--credit {
+  color: var(--pw-success);
+}
+
+.pw-confirm-panel {
+  margin-top: 1rem;
+}
+
+.pw-confirm-panel .pw-actions {
+  margin-top: 0.75rem;
+}
+
+.pw-confirm-panel .pw-actions .pw-button {
+  flex: 1 1 auto;
+}
+
+.pw-ledger-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.pw-ledger-filter .pw-field {
+  flex: 1 1 160px;
+  margin-bottom: 0;
+}
+
+/* Scroll-to-load feedback under the ledger. Holds its line height while empty
+   so appending a page doesn't shift the rows above it. */
+.pw-ledger-status {
+  min-height: 1.25rem;
+  margin: 0.5rem 0 0;
+  color: var(--pw-ink-muted);
+  font-size: 0.85rem;
+}
+
+.pw-item-tags {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+  font-size: 0.75rem;
+  font-weight: 400;
+}
+
+/* Ledger row's title can wrap to two lines while the amount/tags column
+   stays short — top-align instead of the list's default baseline so the
+   two columns don't drift apart. The whole row is the tap target (it leads
+   to the Transfer/Reconciliation/edit page — see transaction-ledger.tsx), so
+   min-height keeps the 44px floor explicit rather than relying on content
+   (title + timestamp + tags) happening to be tall enough on every row. */
+.pw-list > li > a.pw-ledger-row {
+  align-items: flex-start;
+  min-height: 2.75rem;
+  gap: 0.75rem;
+  padding: 0.55rem 0.85rem;
+}
+
+/* .pw-list > li > a/span is the only rule that insets a direct <li> child —
+   this is a second direct child (a plain <div>, not <a>/<span>), so without
+   its own padding it would render flush against the list's edges instead of
+   aligned under the ledger row above it. */
+.pw-import-line-actions {
+  margin-top: 0;
+  padding: 0 0.85rem 0.65rem;
+}
+
+.pw-ledger-row .pw-item-title {
+  font-size: 0.9rem;
+}
+
+.pw-ledger-row .pw-item-sub {
+  margin-top: 0.1rem;
+  font-size: 0.75rem;
+}
+
+.pw-ledger-row .pw-item-amount {
+  font-size: 0.9rem;
+}
+
+.pw-ledger-row .pw-item-tags {
+  margin-top: 0.3rem;
+  gap: 0.3rem;
+  font-size: 0.7rem;
+}
+
+.pw-ledger-row .pw-trust-status,
+.pw-ledger-row .pw-category-tag {
+  padding: 0.05rem 0.4rem;
+}
+
+.pw-trust-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.1rem 0.5rem;
+  font-weight: 600;
+  border-radius: 999px;
+  border: 1px solid var(--pw-border);
+}
+
+.pw-trust-status--confirmed {
+  color: var(--pw-ink-muted);
+  background: var(--pw-bg);
+}
+
+.pw-trust-status--imported {
+  color: var(--pw-accent-text);
+  background: color-mix(in srgb, var(--pw-accent) 10%, var(--pw-bg));
+  border-color: color-mix(in srgb, var(--pw-accent) 30%, var(--pw-border));
+}
+
+/* Enlarges the tap target to ~44x44 without affecting layout — safe here
+   because a manual ledger row's tags never pair Edit with another link
+   (isManual excludes the Transfer/Adjustment rows), so there's no adjacent
+   hit area for the expanded box to swallow. */
+.pw-item-tag-edit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 0.6rem;
+  margin: -0.75rem -0.6rem;
+  /* Icon-only now (EditIcon) — a bare underline would otherwise draw beneath the icon box. */
+  text-decoration: none;
+}
+
+/* Sized for the small `.pw-item-tags` row (badge pills sit at 0.7-0.75rem there) — the square,
+   non-directional counterpart to `.pw-detail-icon` at a smaller scale for this tighter context. */
+.pw-tag-icon {
+  display: block;
+  width: 0.95rem;
+  height: 0.95rem;
+}
+
+.pw-item-untitled {
+  font-weight: 400;
+  font-style: italic;
+  color: var(--pw-ink-muted);
+}
+
+/* Desktop: fill the main column. Mobile caps above stay unchanged below 768px. */
+@media (min-width: 768px) {
+  :root {
+    --pw-content-form: min(48rem, 100%);
+    --pw-content-wide: min(72rem, 100%);
+  }
+
+  .pw-main {
+    padding: 2rem clamp(1.5rem, 3vw, 2.5rem) 3rem;
+  }
+}
+
+@media (min-width: 1100px) {
+  :root {
+    --pw-content-form: 100%;
+    --pw-content-wide: 100%;
+  }
+
+  .pw-main {
+    padding-inline: clamp(2rem, 4vw, 3.5rem);
+  }
+}
+
+@media (max-width: 640px) {
+  .pw-currency-totals > .pw-detail-lede {
+    display: none;
+  }
+
+  .pw-institutions-filter > .pw-segmented {
+    display: none;
+  }
+
+  .pw-institutions-search {
+    flex: 1 1 100%;
+    max-width: none;
+  }
+
+  .pw-header {
+    padding: 0 0.75rem;
+  }
+
+  .pw-header-start {
+    gap: 0.5rem;
+  }
+
+  .pw-brand-name {
+    display: none;
+  }
+
+  .pw-nav {
+    display: none;
+  }
+
+  .pw-menu.pw-nav-trigger {
+    display: inline-flex;
+  }
+
+  .pw-lang-label-full {
+    display: none;
+  }
+
+  .pw-lang-label-short {
+    display: inline;
+  }
+
+  .pw-header-email {
+    display: none;
+  }
+
+  .pw-main {
+    padding: 1.25rem 1rem calc(2rem + env(safe-area-inset-bottom));
+  }
+
+  .pw-card,
+  .pw-dashboard,
+  .pw-detail {
+    padding: 1.5rem 1.2rem 1.35rem;
+    box-shadow: var(--pw-shadow-sm);
+  }
+
+  .pw-card h1 {
+    font-size: 1.45rem;
+  }
+
+  .pw-dashboard h1,
+  .pw-detail h1 {
+    font-size: 1.5rem;
+  }
+
+  .pw-balance {
+    padding: 0.9rem 1rem;
+  }
+
+  .pw-balance-value {
+    font-size: 1.7rem;
+  }
+
+  .pw-facts > div {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.2rem;
+  }
+
+  .pw-facts dd {
+    text-align: start;
+  }
+
+  .pw-sticky-actions {
+    margin: 1.5rem -1.2rem -1.35rem;
+    padding: 0.85rem 1.2rem calc(0.85rem + env(safe-area-inset-bottom));
+  }
+
+  .pw-field-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .pw-actions a,
+  .pw-actions > form {
+    flex: 1 1 calc(50% - 0.65rem);
+    justify-content: center;
+  }
+
+  .pw-actions > form .pw-button {
+    width: 100%;
+  }
+
+  .pw-sticky-actions > a.pw-action-primary {
+    flex: 1 1 100%;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Right-to-left (Arabic)
+
+   Everything else mirrors from logical properties alone. These three cannot:
+   `transform` has no logical equivalent, and the directional glyphs are drawn
+   into their SVG paths rather than expressed as layout.
+   --------------------------------------------------------------------------- */
+
+/* Back chevron and the sign-out arrow point the other way in RTL. */
+[dir="rtl"] .pw-back-link svg,
+[dir="rtl"] .pw-menu-icon {
+  transform: scaleX(-1);
+}
+
+/* Collapsed section chevron rotates toward the inline start. */
+[dir="rtl"] .pw-section-toggle[aria-expanded="false"] svg,
+[dir="rtl"] .pw-section-heading-button[aria-expanded="false"] svg {
+  transform: rotate(90deg);
+}
+
+/* The toggle thumb travels toward the inline end. */
+[dir="rtl"] .pw-toggle-input:checked + .pw-toggle-track .pw-toggle-thumb {
+  transform: translateX(-1.35rem);
+}

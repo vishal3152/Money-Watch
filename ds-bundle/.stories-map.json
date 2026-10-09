@@ -1,0 +1,76 @@
+{
+  "global": "PaisaWatchUI",
+  "pkg": "@paisa-watch/ui",
+  "pkgDir": "/Users/vishalyadav/Projects/Paisa-Watch-1/packages/ui",
+  "extraEntries": [],
+  "exported": [
+    "CollapsibleSectionList",
+    "DecimalInput",
+    "DeleteConfirmForm",
+    "LedgerFilter",
+    "SegmentedControl",
+    "SheetSelect",
+    "ToggleField"
+  ],
+  "storybookStatic": null,
+  "keyRecipe": 7,
+  "cfgSliceGlobal": "a139d95ad8ab0a8ba08b44a258c54602e36090304087f48fe923c61aa5a8ae08",
+  "components": [
+    {
+      "name": "CollapsibleSectionList",
+      "group": "general",
+      "srcSha": null,
+      "sourceKey": "0c0314cd858b1ac1",
+      "cfgSlice": "5ff899b099eb6923833804cda955efdd69101524bec86f67dac5537cd81802e8",
+      "stories": []
+    },
+    {
+      "name": "DecimalInput",
+      "group": "general",
+      "srcSha": null,
+      "sourceKey": "fb914963d32babd1",
+      "cfgSlice": "5ff899b099eb6923833804cda955efdd69101524bec86f67dac5537cd81802e8",
+      "stories": []
+    },
+    {
+      "name": "DeleteConfirmForm",
+      "group": "general",
+      "srcSha": null,
+      "sourceKey": "50831a91059415f5",
+      "cfgSlice": "5ff899b099eb6923833804cda955efdd69101524bec86f67dac5537cd81802e8",
+      "stories": []
+    },
+    {
+      "name": "LedgerFilter",
+      "group": "general",
+      "srcSha": null,
+      "sourceKey": "fa403c6c21f98fb8",
+      "cfgSlice": "5ff899b099eb6923833804cda955efdd69101524bec86f67dac5537cd81802e8",
+      "stories": []
+    },
+    {
+      "name": "SegmentedControl",
+      "group": "general",
+      "srcSha": null,
+      "sourceKey": "996815c487b29548",
+      "cfgSlice": "5ff899b099eb6923833804cda955efdd69101524bec86f67dac5537cd81802e8",
+      "stories": []
+    },
+    {
+      "name": "SheetSelect",
+      "group": "general",
+      "srcSha": null,
+      "sourceKey": "74b1a8b35233da4f",
+      "cfgSlice": "5ff899b099eb6923833804cda955efdd69101524bec86f67dac5537cd81802e8",
+      "stories": []
+    },
+    {
+      "name": "ToggleField",
+      "group": "general",
+      "srcSha": null,
+      "sourceKey": "3817f68cdbfd856f",
+      "cfgSlice": "5ff899b099eb6923833804cda955efdd69101524bec86f67dac5537cd81802e8",
+      "stories": []
+    }
+  ]
+}

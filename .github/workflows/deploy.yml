@@ -1,0 +1,67 @@
+name: Deploy to Vercel
+
+on:
+  push:
+    branches:
+      - cloud-tier/slice-3-supabase-auth-core
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-vercel-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        env:
+          # Electron's binary is only needed for the desktop package step, which
+          # this workflow skips (see scripts/package-electron.sh: mac/linux/win).
+          ELECTRON_SKIP_BINARY_DOWNLOAD: "1"
+
+      - name: Lint
+        run: pnpm lint
+
+      # Starts the local Supabase (Postgres + Auth) Docker stack and applies
+      # migrations, so `pnpm release`'s test step can run the Postgres/Auth
+      # suite the same way `pnpm supabase:start` does locally.
+      - name: Start local Supabase stack
+        run: pnpm supabase:start
+
+      # tests -> typecheck -> Vercel deploy. Electron packaging and the GitHub
+      # Release step are skipped here: packaging builds a platform-specific
+      # desktop artifact (scripts/package-electron.sh) and creating a GitHub
+      # Release isn't part of deploying to Vercel. No `--` before the flags:
+      # pnpm forwards a literal `--` straight through to the script rather than
+      # stripping it, and release.sh's own arg parser doesn't recognize `--`
+      # as a flag, so it exited with "Unknown flag: --" before reaching Vercel.
+      - name: Release (test, typecheck, deploy to Vercel)
+        run: pnpm release --skip-electron --skip-github
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: Stop local Supabase stack
+        if: always()
+        run: pnpm supabase:stop

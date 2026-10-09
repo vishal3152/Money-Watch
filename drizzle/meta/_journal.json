@@ -1,0 +1,139 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1788543949217,
+      "tag": "0000_omniscient_franklin_richards",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1788545105016,
+      "tag": "0001_sudden_major_mapleleaf",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1788545486784,
+      "tag": "0002_red_cannonball",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1788546086690,
+      "tag": "0003_early_devos",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1788546541045,
+      "tag": "0004_glorious_alex_power",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1788579358302,
+      "tag": "0005_solid_master_mold",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1788582349708,
+      "tag": "0006_eminent_harry_osborn",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1788590345610,
+      "tag": "0007_fixed_deposit_name",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1788592221928,
+      "tag": "0008_account_number",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "6",
+      "when": 1788594864526,
+      "tag": "0009_import_batches",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "6",
+      "when": 1789117297469,
+      "tag": "0010_chief_santa_claus",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "6",
+      "when": 1789148058575,
+      "tag": "0011_chunky_betty_brant",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "6",
+      "when": 1789151831519,
+      "tag": "0012_spooky_tomorrow_man",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "6",
+      "when": 1789235772077,
+      "tag": "0013_processed_email_alert_failure_reason",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "6",
+      "when": 1789238000000,
+      "tag": "0014_processed_email_alert_parsed_alert",
+      "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "6",
+      "when": 1789238611041,
+      "tag": "0015_bizarre_firebrand",
+      "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "6",
+      "when": 1789400312318,
+      "tag": "0016_wise_selene",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "6",
+      "when": 1789401226051,
+      "tag": "0017_tranquil_wendigo",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "6",
+      "when": 1789401622602,
+      "tag": "0018_bitter_invisible_woman",
+      "breakpoints": true
+    }
+  ]
+}
