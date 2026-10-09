@@ -12,7 +12,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "electron:dev": "env -u ELECTRON_RUN_AS_NODE ELECTRON_DEV=1 electron .",
-    "electron:start": "pnpm build && env -u ELECTRON_RUN_AS_NODE electron .",
+    "electron:start": "env DEPLOYMENT_MODE=local pnpm build && env -u ELECTRON_RUN_AS_NODE electron .",
     "electron:package": "bash scripts/package-electron.sh",
     "release": "bash scripts/release.sh",
     "prepare:database": "tsx scripts/prepare-database.ts",

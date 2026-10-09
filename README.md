@@ -408,10 +408,12 @@ The suite is ~130 colocated test files. **For the full `pnpm test` run, local Po
 
 ```bash
 pnpm build                   # production Next.js build
-pnpm electron:start          # build, then run the desktop app against the production build
+pnpm electron:start          # local-mode production build, then the desktop app
 pnpm electron:package        # macOS .dmg+.zip (on macOS), or Linux .AppImage + Windows .exe (on Linux) into dist/electron/
 pnpm release                 # tests → typecheck → package → GitHub Release → Vercel deploy
 ```
+
+`pnpm electron:start` forces `DEPLOYMENT_MODE=local` on `next build`. A cloud value in `.env.local` would otherwise replace `better-sqlite3` with the cloud stub in the production server, and the desktop app would fail to open its database.
 
 `pnpm release` accepts `--skip-tests`, `--skip-typecheck`, `--skip-electron`, `--skip-github`, `--skip-vercel`. It needs `gh auth login` for the GitHub Release step and a linked Vercel project (or `VERCEL_TOKEN`) for the deploy step.
 
