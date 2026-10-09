@@ -15,7 +15,7 @@
 [![Electron](https://img.shields.io/badge/Electron-desktop-47848F?logo=electron&logoColor=white)](https://electronjs.org)
 [![MCP](https://img.shields.io/badge/MCP-server-D97757)](https://modelcontextprotocol.io)
 
-[Desktop app](#option-a-desktop-app-electron) · [Run it locally](#option-b-run-from-source-local-mode) · [Self-host the cloud mode](#option-c-cloud-mode-supabase) · [Architecture](#architecture) · [FAQ](#faq)
+[Desktop app](#option-a--desktop-app-electron) · [Run it locally](#option-b--run-from-source-local-mode) · [Self-host the cloud mode](#option-c--cloud-mode-supabase) · [Architecture](#architecture) · [FAQ](#faq)
 
 </div>
 
@@ -41,10 +41,10 @@ That's the whole thesis: **independent verification over trust.**
 - [Two ways to run it](#two-ways-to-run-it)
 - [Privacy and data ownership](#privacy-and-data-ownership)
 - [Getting started](#getting-started)
-  - [Option A — Desktop app (Electron)](#option-a-desktop-app-electron)
-  - [Option B — Run from source (local mode)](#option-b-run-from-source-local-mode)
-  - [Option C — Cloud mode (Supabase)](#option-c-cloud-mode-supabase)
-  - [Option D — Cloud mode without Supabase (email/password auth)](#option-d-cloud-mode-without-supabase-emailpassword-auth)
+  - [Option A — Desktop app (Electron)](#option-a--desktop-app-electron)
+  - [Option B — Run from source (local mode)](#option-b--run-from-source-local-mode)
+  - [Option C — Cloud mode (Supabase)](#option-c--cloud-mode-supabase)
+  - [Option D — Cloud mode without Supabase (email/password auth)](#option-d--cloud-mode-without-supabase-emailpassword-auth)
 - [Environment variables](#environment-variables)
 - [Why Supabase, and when you actually need it](#why-supabase-and-when-you-actually-need-it)
 - [AI features (opt-in)](#ai-features-opt-in)
@@ -83,7 +83,7 @@ The same codebase, the same screens, and the same Server Actions run in **two pe
 <table>
 <tr><th></th><th>🖥️ Local / self-hosted mode</th><th>☁️ Cloud mode</th></tr>
 <tr><td><b>Database</b></td><td>SQLite file on your disk (<code>better-sqlite3</code>)</td><td>Supabase Postgres</td></tr>
-<tr><td><b>Auth</b></td><td>None — there is no login screen at all</td><td>Supabase Auth (email/password with self-service password reset, + Google sign-in) by default, or static per-email accounts with <code>AUTH_PROVIDER=simple</code> (<a href="#option-d-cloud-mode-without-supabase-emailpassword-auth">Option D</a>)</td></tr>
+<tr><td><b>Auth</b></td><td>None — there is no login screen at all</td><td>Supabase Auth (email/password with self-service password reset, + Google sign-in) by default, or static per-email accounts with <code>AUTH_PROVIDER=simple</code> (<a href="#option-d--cloud-mode-without-supabase-emailpassword-auth">Option D</a>)</td></tr>
 <tr><td><b>Owners per install</b></td><td>Exactly one</td><td>Many, each fully isolated</td></tr>
 <tr><td><b>How you run it</b></td><td>Desktop app (Electron), <code>next dev</code>/<code>next start</code> in a browser, or Docker/NAS</td><td>Vercel (or any Node host) + a Supabase project</td></tr>
 <tr><td><b>Where secrets live</b></td><td><code>~/.config/paisa-watch/settings.json</code> on your own machine</td><td>Postgres, with IMAP credentials encrypted at rest (AES-256-GCM)</td></tr>
@@ -134,7 +134,7 @@ Email alert sync is the one place the app makes an LLM call on your behalf — a
 
 ### Option A — Desktop app (Electron)
 
-This repo does not publish installers. Build the desktop app yourself with [`pnpm electron:package`](#building-and-releasing) after the [clone and install](#option-b-run-from-source-local-mode) steps below.
+This repo does not publish installers. Build the desktop app yourself with [`pnpm electron:package`](#building-and-releasing) after the [clone and install](#option-b--run-from-source-local-mode) steps below.
 
 On macOS that produces `Paisa-Watch-<version>-arm64.dmg` and a matching `.zip` in `dist/electron/`. The app bundles its own Next.js server and SQLite. On first launch it creates and migrates its database at `~/Library/Application Support/Paisa-Watch/paisa-watch.db`, then opens a window. You can move that file anywhere from **Settings**.
 
