@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# Build production Electron packages: macOS (dmg+zip) on a macOS host, or
-# Linux (AppImage) + Windows (nsis) on a Linux host — each platform's
+# Build production Electron packages: macOS (dmg+zip) + Windows (nsis) on a macOS
+# host, or Linux (AppImage) + Windows (nsis) on a Linux host — each platform's
 # electron-builder target needs its own prebuild-pruned resources copy, since
 # better-sqlite3 ships one native module per platform/arch (see below).
 # Pass platform names (mac/linux/win) as args to override the host default.
-# Building the Windows target from a non-Windows host needs Wine (wine64 + wine32/i386)
+# Building the Windows target from a Linux host needs Wine (wine64 + wine32/i386)
 # installed — see the preflight check below for why and the install command.
 # Assumes tests were already run by `scripts/release.sh` (or run `pnpm test` yourself).
 set -euo pipefail
@@ -16,7 +16,7 @@ if [[ "$#" -gt 0 ]]; then
   PLATFORMS=("$@")
 else
   case "$(uname -s)" in
-    Darwin) PLATFORMS=(mac) ;;
+    Darwin) PLATFORMS=(mac win) ;;
     Linux) PLATFORMS=(linux win) ;;
     *)
       echo "error: unsupported host OS '$(uname -s)' for Electron packaging; pass target platforms explicitly (mac/linux/win)" >&2
@@ -34,13 +34,22 @@ for platform in "${PLATFORMS[@]}"; do
       ;;
   esac
 
-  # Building the Windows NSIS installer from a non-Windows host needs Wine: electron-builder
+  # Building the Windows NSIS installer from a Linux host needs Wine: electron-builder
   # runs the freshly-built installer.exe itself (via Wine) to produce the uninstaller.exe,
   # which needs both wine64 and wine32 (a 32-bit NSIS installer stub runs under Wow64) — without
   # it the build fails deep inside electron-builder with a cryptic "wine process failed ENOENT".
-  if [[ "$platform" == "win" && "$(uname -s)" != "Windows_NT" ]] && ! command -v wine >/dev/null 2>&1; then
+  # macOS ≥10.15 hosts extract the uninstaller natively (NsisTarget.js's UninstallerReader), no Wine.
+  if [[ "$platform" == "win" && "$(uname -s)" == "Linux" ]] && ! command -v wine >/dev/null 2>&1; then
     echo "error: building the Windows target from a non-Windows host requires Wine (wine64 + wine32/i386), e.g. on Ubuntu:" >&2
     echo "  sudo dpkg --add-architecture i386 && sudo apt-get update && sudo apt-get install -y wine wine32:i386" >&2
+    exit 1
+  fi
+
+  # electron-builder's bundled mac makensis is x86_64-only — Apple Silicon runs it under Rosetta 2,
+  # otherwise the NSIS step dies with "spawn Unknown system error -86" (EBADARCH).
+  if [[ "$platform" == "win" && "$(uname -s)" == "Darwin" && "$(uname -m)" == "arm64" ]] && ! arch -x86_64 /usr/bin/true 2>/dev/null; then
+    echo "error: building the Windows target on Apple Silicon requires Rosetta 2 (electron-builder's makensis is x86_64-only):" >&2
+    echo "  softwareupdate --install-rosetta --agree-to-license" >&2
     exit 1
   fi
 done
@@ -263,7 +272,8 @@ for platform in "${PLATFORMS[@]}"; do
   case "$platform" in
     mac) electron_builder_args+=(--mac dmg zip) ;;
     linux) electron_builder_args+=(--linux AppImage) ;;
-    win) electron_builder_args+=(--win nsis) ;;
+    # Pinned to x64 to match the kept win32-x64 prebuild — a bare `nsis` follows the host arch.
+    win) electron_builder_args+=(--win nsis:x64) ;;
   esac
 done
 

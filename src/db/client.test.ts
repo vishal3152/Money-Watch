@@ -10,6 +10,7 @@ import { InstitutionRepository } from "@/db/repositories/institution-repository"
 
 describe("createDb", () => {
   const originalDatabasePath = process.env.DATABASE_PATH;
+  const originalMigrationsFolder = process.env.MIGRATIONS_FOLDER;
   const tempRoots: string[] = [];
 
   afterEach(() => {
@@ -21,6 +22,12 @@ describe("createDb", () => {
       delete process.env.DATABASE_PATH;
     } else {
       process.env.DATABASE_PATH = originalDatabasePath;
+    }
+
+    if (originalMigrationsFolder === undefined) {
+      delete process.env.MIGRATIONS_FOLDER;
+    } else {
+      process.env.MIGRATIONS_FOLDER = originalMigrationsFolder;
     }
   });
 
@@ -51,6 +58,15 @@ describe("createDb", () => {
     const blockingFile = join(root, "blocker");
     writeFileSync(blockingFile, "not a directory");
     const databasePath = join(blockingFile, "nested", "paisa-watch.db");
+
+    expect(() => createDb(databasePath)).toThrow(DatabaseError);
+  });
+
+  it("honors MIGRATIONS_FOLDER when set", () => {
+    const root = mkdtempSync(join(tmpdir(), "paisa-watch-client-"));
+    tempRoots.push(root);
+    const databasePath = join(root, "paisa-watch.db");
+    process.env.MIGRATIONS_FOLDER = join(root, "missing-migrations");
 
     expect(() => createDb(databasePath)).toThrow(DatabaseError);
   });

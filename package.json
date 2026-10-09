@@ -60,6 +60,7 @@
     "appId": "app.paisawatch.desktop",
     "productName": "Money Watch",
     "copyright": "Copyright © Money Watch",
+    "icon": "public/brand/logo-mark.png",
     "directories": {
       "app": "dist/electron-app",
       "output": "dist/electron"

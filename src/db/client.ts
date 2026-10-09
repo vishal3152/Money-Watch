@@ -14,6 +14,17 @@ export type DrizzleDb = BetterSQLite3Database<typeof schema>;
 
 const migratedPaths = new Set<string>();
 
+function resolveMigrationsFolder(): string {
+  if (
+    process.env.MIGRATIONS_FOLDER !== undefined &&
+    process.env.MIGRATIONS_FOLDER.trim().length > 0
+  ) {
+    return process.env.MIGRATIONS_FOLDER.trim();
+  }
+
+  return resolve(process.cwd(), "drizzle");
+}
+
 function ensureMigrated(resolvedPath: string): void {
   if (migratedPaths.has(resolvedPath)) {
     return;
@@ -26,7 +37,7 @@ function ensureMigrated(resolvedPath: string): void {
     sqlite = new Database(resolvedPath);
     // Some table-rebuild migrations need FK checks disabled during the migration transaction.
     sqlite.pragma("foreign_keys = OFF");
-    migrate(drizzle(sqlite, { schema }), { migrationsFolder: resolve(process.cwd(), "drizzle") });
+    migrate(drizzle(sqlite, { schema }), { migrationsFolder: resolveMigrationsFolder() });
     sqlite.pragma("foreign_keys = ON");
   } catch (error) {
     throw new DatabaseError("Failed to prepare the database.", { cause: error });

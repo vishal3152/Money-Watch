@@ -140,7 +140,7 @@ On macOS that produces `Paisa-Watch-<version>-arm64.dmg` and a matching `.zip` i
 
 > **macOS Gatekeeper:** builds are currently **unsigned and un-notarised**, so macOS will refuse the first launch. Right-click the app → **Open** → **Open**, or run `xattr -dr com.apple.quarantine /Applications/Paisa-Watch.app`.
 
-> **Windows / Linux:** `pnpm electron:package` (and `pnpm release`) also produce a Windows installer (`Paisa-Watch Setup <version>.exe`, NSIS) and a Linux package (`Paisa-Watch-<version>.AppImage`) when run on a Linux host — see [Building and releasing](#building-and-releasing). Option B runs from source on every platform.
+> **Windows / Linux:** `pnpm electron:package` (and `pnpm release`) also produce a Windows installer (`Paisa-Watch Setup <version>.exe`, NSIS, x64) on macOS and Linux hosts, and a Linux package (`Paisa-Watch-<version>.AppImage`) on a Linux host — see [Building and releasing](#building-and-releasing). Option B runs from source on every platform.
 
 ### Option B — Run from source (local mode)
 
@@ -409,7 +409,7 @@ The suite is ~130 colocated test files. **For the full `pnpm test` run, local Po
 ```bash
 pnpm build                   # production Next.js build
 pnpm electron:start          # local-mode production build, then the desktop app
-pnpm electron:package        # macOS .dmg+.zip (on macOS), or Linux .AppImage + Windows .exe (on Linux) into dist/electron/
+pnpm electron:package        # macOS .dmg+.zip + Windows .exe (on macOS), or Linux .AppImage + Windows .exe (on Linux) into dist/electron/
 pnpm release                 # tests → typecheck → package → GitHub Release → Vercel deploy
 ```
 
@@ -417,7 +417,7 @@ pnpm release                 # tests → typecheck → package → GitHub Releas
 
 `pnpm release` accepts `--skip-tests`, `--skip-typecheck`, `--skip-electron`, `--skip-github`, `--skip-vercel`. It needs `gh auth login` for the GitHub Release step and a linked Vercel project (or `VERCEL_TOKEN`) for the deploy step.
 
-The Electron packaging step builds whichever platforms the host it runs on can produce: a macOS host builds the `.dmg`/`.zip`; a Linux host builds a Windows `.exe` installer (NSIS) and a Linux `.AppImage` — no Windows/macOS machine required. Building the Windows installer from Linux does need **Wine** installed (`wine` + the 32-bit `wine32:i386` package), since electron-builder runs the freshly built installer through Wine to generate its uninstaller; the script checks for this up front and fails with install instructions if it's missing. Pass target platforms explicitly (`pnpm exec bash scripts/package-electron.sh mac linux win`) to override the default.
+The Electron packaging step builds whichever platforms the host it runs on can produce: a macOS host builds the `.dmg`/`.zip` plus a Windows `.exe` installer (NSIS, x64); a Linux host builds the same Windows `.exe` and a Linux `.AppImage` — no Windows machine required. Building the Windows installer from Linux does need **Wine** installed (`wine` + the 32-bit `wine32:i386` package), since electron-builder runs the freshly built installer through Wine to generate its uninstaller; macOS needs no Wine, but on Apple Silicon it needs **Rosetta 2** (`softwareupdate --install-rosetta --agree-to-license`) because electron-builder's bundled `makensis` is x86_64-only. The script checks for both up front and fails with install instructions if they're missing. Pass target platforms explicitly (`pnpm exec bash scripts/package-electron.sh mac linux win`) to override the default.
 
 The packaging script takes desktop privacy seriously: it moves every `.env*` file out of the project root before building and **asserts none made it into the packaged tree**, so cloud credentials can't be accidentally inlined into a desktop binary via `NEXT_PUBLIC_*`.
 
@@ -435,7 +435,7 @@ This is an actively developed personal project, published in the open. Stated ho
 
 - **No local ↔ cloud migration tool.** Moving a dataset between tiers is a future decision, not an assumed one.
 - **Nothing auto-starts the local email-sync poller** — you run `pnpm email-sync:poll` yourself today.
-- **No desktop installers published on this repo yet** — `pnpm electron:package`/`pnpm release` build a macOS `.dmg`/`.zip` on macOS, and a Windows installer plus a Linux AppImage on Linux (see [Building and releasing](#building-and-releasing)). All builds are unsigned.
+- **No desktop installers published on this repo yet** — `pnpm electron:package`/`pnpm release` build a macOS `.dmg`/`.zip` plus a Windows installer on macOS, and a Windows installer plus a Linux AppImage on Linux (see [Building and releasing](#building-and-releasing)). All builds are unsigned.
 - **No review UI for unresolved email alerts** whose account couldn't be matched deterministically (they're recorded with a failure reason, but assignment is manual).
 - **Share trading is intentionally minimal**: no cash legs, no cost basis, no valuation, no reconciliation equivalent.
 - **The MCP endpoint has no OAuth flow**, so hosted AI clients that require dynamic client registration can't connect ([ADR-0008](docs/adr/0008-mcp-endpoint-adds-scoped-oauth-for-remote-clients.md) proposes it).

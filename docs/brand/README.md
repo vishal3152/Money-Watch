@@ -12,7 +12,7 @@ Classic personal finance register energy — your ledger across institutions, re
 | --- | --- |
 | `public/brand/logo-mark.svg` | App icon source, favicon (`src/app/icon.svg`), header mark |
 | `public/brand/logo-lockup.svg` | README, docs, marketing width |
-| `public/brand/logo-mark.png` / `logo-lockup.png` | Contexts that require raster (regenerate from SVG when the mark changes) |
+| `public/brand/logo-mark.png` / `logo-lockup.png` | Contexts that require raster (regenerate from SVG when the mark changes); `logo-mark.png` is the desktop app icon (`package.json` `build.icon`, ≥512×512) |
 
 ### Mark
 

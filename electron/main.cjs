@@ -282,7 +282,8 @@ async function main() {
     ...process.env,
     DEPLOYMENT_MODE: "local",
     PAISA_WATCH_DESKTOP: "1",
-    DATABASE_PATH: databasePath
+    DATABASE_PATH: databasePath,
+    MIGRATIONS_FOLDER: layout.migrationsFolder
   };
 
   await runPrepareDatabase(layout, env);
