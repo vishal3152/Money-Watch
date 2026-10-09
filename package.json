@@ -79,7 +79,7 @@
       ],
       "hardenedRuntime": true,
       "gatekeeperAssess": false,
-      "identity": null,
+      "identity": "-",
       "electronLanguages": [
         "en"
       ],

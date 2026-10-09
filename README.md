@@ -138,7 +138,7 @@ This repo does not publish installers. Build the desktop app yourself with [`pnp
 
 On macOS that produces `Paisa-Watch-<version>-arm64.dmg` and a matching `.zip` in `dist/electron/`. The app bundles its own Next.js server and SQLite. On first launch it creates and migrates its database at `~/Library/Application Support/Paisa-Watch/paisa-watch.db`, then opens a window. You can move that file anywhere from **Settings**.
 
-> **macOS Gatekeeper:** builds are currently **unsigned and un-notarised**, so macOS will refuse the first launch. Right-click the app → **Open** → **Open**, or run `xattr -dr com.apple.quarantine /Applications/Paisa-Watch.app`.
+> **macOS Gatekeeper:** builds are currently **ad-hoc signed but not notarised** (no Apple Developer ID), so macOS blocks the first launch of a downloaded copy with "Apple could not verify…". Click **Done**, then open **System Settings → Privacy & Security** and click **Open Anyway** next to Money Watch — or run `xattr -dr com.apple.quarantine "/Applications/Money Watch.app"`.
 
 > **Windows / Linux:** `pnpm electron:package` (and `pnpm release`) also produce a Windows installer (`Paisa-Watch Setup <version>.exe`, NSIS, x64) on macOS and Linux hosts, and a Linux package (`Paisa-Watch-<version>.AppImage`) on a Linux host — see [Building and releasing](#building-and-releasing). Option B runs from source on every platform.
 
@@ -435,7 +435,7 @@ This is an actively developed personal project, published in the open. Stated ho
 
 - **No local ↔ cloud migration tool.** Moving a dataset between tiers is a future decision, not an assumed one.
 - **Nothing auto-starts the local email-sync poller** — you run `pnpm email-sync:poll` yourself today.
-- **No desktop installers published on this repo yet** — `pnpm electron:package`/`pnpm release` build a macOS `.dmg`/`.zip` plus a Windows installer on macOS, and a Windows installer plus a Linux AppImage on Linux (see [Building and releasing](#building-and-releasing)). All builds are unsigned.
+- **No desktop installers published on this repo yet** — `pnpm electron:package`/`pnpm release` build a macOS `.dmg`/`.zip` plus a Windows installer on macOS, and a Windows installer plus a Linux AppImage on Linux (see [Building and releasing](#building-and-releasing)). The macOS build is only ad-hoc signed (not notarised); the Windows and Linux builds are unsigned.
 - **No review UI for unresolved email alerts** whose account couldn't be matched deterministically (they're recorded with a failure reason, but assignment is manual).
 - **Share trading is intentionally minimal**: no cash legs, no cost basis, no valuation, no reconciliation equivalent.
 - **The MCP endpoint has no OAuth flow**, so hosted AI clients that require dynamic client registration can't connect ([ADR-0008](docs/adr/0008-mcp-endpoint-adds-scoped-oauth-for-remote-clients.md) proposes it).
@@ -533,7 +533,7 @@ The product and this GitHub repo are **Money Watch**. The npm package name, Elec
 <details>
 <summary><b>macOS says the app is damaged or from an unidentified developer.</b></summary><br>
 
-The builds are unsigned and un-notarised (code-signing certificates cost money). Right-click the app → **Open** → **Open**, or run `xattr -dr com.apple.quarantine /Applications/Paisa-Watch.app`. If you'd rather not run an unsigned binary, clone the repo and run `pnpm electron:package` to build the identical artifact yourself.
+The macOS build is ad-hoc signed but not notarised (a Developer ID certificate costs money). After the first blocked launch, open **System Settings → Privacy & Security** and click **Open Anyway**, or run `xattr -dr com.apple.quarantine "/Applications/Money Watch.app"`. If you'd rather not run an unsigned binary, clone the repo and run `pnpm electron:package` to build the identical artifact yourself.
 </details>
 
 <details>
